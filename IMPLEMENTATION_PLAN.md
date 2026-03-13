@@ -62,11 +62,17 @@ Sorted by implementation priority (dependency order).
 - [x] **8.5 Search term highlighting in chat view** — When navigating from search results with `?q=searchTerm`, matching terms are highlighted with `<mark>` tags inside rendered message text. Uses `highlightSearchTerms()` in `src/lib/markdown.ts`.
 - [x] **8.6 Keyboard navigation for search results** — Arrow Up/Down cycles through results with visual ring highlight, Enter navigates to selected (or first) result. `selectedIndex` state in Sidebar.
 
-## Phase 9: Spec Compliance — Should-Have Gaps
+## Phase 9: Spec Compliance — Should-Have Gaps ✅
 
 - [x] **9.1 Project doc markdown rendering** — Doc content rendered via `renderMarkdown()` instead of raw `<pre><code>`. Includes scoped markdown styles.
 - [x] **9.2 Search history** — Remember recent search terms. Stored in localStorage (`claude-archive-search-history`), max 10 items. Dropdown appears when search input is focused with empty query. Individual items can be removed.
 - [x] **9.3 Global Escape key** — Escape dismisses sidebar overlay on mobile and clears search from anywhere via `clearSearchState()` on Sidebar.
+
+## Phase 10: Server-Side Data Loading ✅
+
+- [x] **10.1 Layout server load** — `+layout.server.ts` loads initial 50 conversations server-side, eliminating skeleton flash on first render. Sidebar receives `initialConversations`, `totalConversations`, `hasMoreInitial` props.
+- [x] **10.2 Chat page server load** — `chat/[uuid]/+page.server.ts` loads conversation metadata + messages server-side. Returns 404 error for invalid UUIDs. Chat page uses `PageProps` with server data — no client-side fetch needed.
+- [x] **10.3 Sidebar hydration** — Sidebar initializes from server-provided data, falls back to client-side fetch if no initial data. Infinite scroll still fetches additional pages client-side via `/api/conversations`.
 
 ---
 

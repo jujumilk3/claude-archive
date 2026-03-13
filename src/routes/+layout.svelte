@@ -2,8 +2,9 @@
 	import '../app.css';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { browser } from '$app/environment';
+	import type { LayoutProps } from './$types';
 
-	let { children } = $props();
+	let { children, data }: LayoutProps = $props();
 	let sidebarCollapsed = $state(false);
 	let sidebarRef = $state<Sidebar>();
 	let isMobile = $state(false);
@@ -72,10 +73,16 @@
 				aria-label="사이드바 닫기"
 			></button>
 			<div class="fixed inset-y-0 left-0 z-40 w-[260px]">
-				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate} />
+				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
+				initialConversations={data.initialConversations}
+				totalConversations={data.totalConversations}
+				hasMoreInitial={data.hasMoreConversations} />
 			</div>
 		{:else}
-			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate} />
+			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
+				initialConversations={data.initialConversations}
+				totalConversations={data.totalConversations}
+				hasMoreInitial={data.hasMoreConversations} />
 		{/if}
 	{/if}
 

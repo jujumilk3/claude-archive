@@ -23,7 +23,17 @@
 		conversations: Conversation[];
 	}
 
-	let { onNavigate }: { onNavigate?: () => void } = $props();
+	let {
+		onNavigate,
+		initialConversations = [],
+		totalConversations = 0,
+		hasMoreInitial = true
+	}: {
+		onNavigate?: () => void;
+		initialConversations?: Conversation[];
+		totalConversations?: number;
+		hasMoreInitial?: boolean;
+	} = $props();
 
 	let conversations: Conversation[] = $state([]);
 	let searchResults: SearchResult[] = $state([]);
@@ -31,6 +41,7 @@
 	let isSearching = $state(false);
 	let hasMore = $state(true);
 	let loading = $state(false);
+	let initialized = false;
 	let searchTotal = $state(0);
 	let selectedIndex = $state(-1);
 	let searchFocused = $state(false);
@@ -81,7 +92,15 @@
 	const currentUuid = $derived($page.params?.uuid || '');
 
 	$effect(() => {
-		loadConversations();
+		if (!initialized) {
+			initialized = true;
+			if (initialConversations.length > 0) {
+				conversations = initialConversations;
+				hasMore = hasMoreInitial;
+			} else {
+				loadConversations();
+			}
+		}
 	});
 
 	async function loadConversations(offset = 0) {
