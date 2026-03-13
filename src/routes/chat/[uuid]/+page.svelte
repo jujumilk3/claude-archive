@@ -74,15 +74,32 @@
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-bg-primary">
 	{#if loading}
-		<div class="flex h-full items-center justify-center">
-			<p class="text-text-secondary">로딩 중...</p>
+		<div class="flex h-full flex-col">
+			<header class="border-b border-border px-6 py-3 pl-12 md:pl-6">
+				<div class="skeleton h-6 w-48"></div>
+			</header>
+			<div class="flex-1 overflow-hidden">
+				<div class="mx-auto max-w-3xl space-y-6 px-4 py-6">
+					{#each [true, false, true, false, true] as isHuman}
+						<div class="flex {isHuman ? 'justify-end' : 'justify-start'}">
+							<div class="space-y-2 {isHuman ? 'w-2/3' : 'w-3/4'}">
+								<div class="skeleton h-4 w-full"></div>
+								<div class="skeleton h-4 w-5/6"></div>
+								{#if !isHuman}
+									<div class="skeleton h-4 w-4/6"></div>
+								{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
 		</div>
 	{:else if errorMsg}
 		<div class="flex h-full items-center justify-center">
 			<p class="text-text-secondary">{errorMsg}</p>
 		</div>
 	{:else if conversation}
-		<header class="border-b border-border px-6 py-3">
+		<header class="border-b border-border px-6 py-3 pl-12 md:pl-6">
 			<h1 class="text-lg font-medium text-text-primary">
 				{conversation.name || '(제목 없음)'}
 			</h1>

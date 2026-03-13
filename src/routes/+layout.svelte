@@ -6,19 +6,35 @@
 	let { children } = $props();
 	let sidebarCollapsed = $state(false);
 	let sidebarRef = $state<Sidebar>();
+	let isMobile = $state(false);
 
 	$effect(() => {
 		if (browser) {
 			const saved = localStorage.getItem('sidebar-collapsed');
 			if (saved === 'true') sidebarCollapsed = true;
+
+			const mq = window.matchMedia('(max-width: 767px)');
+			isMobile = mq.matches;
+			const handler = (e: MediaQueryListEvent) => {
+				isMobile = e.matches;
+				if (e.matches) sidebarCollapsed = true;
+			};
+			mq.addEventListener('change', handler);
+			if (isMobile) sidebarCollapsed = true;
+
+			return () => mq.removeEventListener('change', handler);
 		}
 	});
 
 	function toggleSidebar() {
 		sidebarCollapsed = !sidebarCollapsed;
-		if (browser) {
+		if (browser && !isMobile) {
 			localStorage.setItem('sidebar-collapsed', String(sidebarCollapsed));
 		}
+	}
+
+	function handleSidebarNavigate() {
+		if (isMobile) sidebarCollapsed = true;
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -30,7 +46,7 @@
 			e.preventDefault();
 			if (sidebarCollapsed) {
 				sidebarCollapsed = false;
-				if (browser) localStorage.setItem('sidebar-collapsed', 'false');
+				if (browser && !isMobile) localStorage.setItem('sidebar-collapsed', 'false');
 			}
 			requestAnimationFrame(() => {
 				sidebarRef?.focusSearch();
@@ -43,7 +59,18 @@
 
 <div class="flex h-screen overflow-hidden">
 	{#if !sidebarCollapsed}
-		<Sidebar bind:this={sidebarRef} />
+		{#if isMobile}
+			<button
+				class="fixed inset-0 z-30 bg-black/50"
+				onclick={() => (sidebarCollapsed = true)}
+				aria-label="사이드바 닫기"
+			></button>
+			<div class="fixed inset-y-0 left-0 z-40 w-[260px]">
+				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate} />
+			</div>
+		{:else}
+			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate} />
+		{/if}
 	{/if}
 
 	<div class="relative flex-1">

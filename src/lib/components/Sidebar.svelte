@@ -23,6 +23,8 @@
 		conversations: Conversation[];
 	}
 
+	let { onNavigate }: { onNavigate?: () => void } = $props();
+
 	let conversations: Conversation[] = $state([]);
 	let searchResults: SearchResult[] = $state([]);
 	let searchQuery = $state('');
@@ -177,7 +179,7 @@
 				<p class="px-3 py-1 text-xs text-text-secondary">{searchTotal}개 결과</p>
 				{#each searchResults as result}
 					<button
-						onclick={() => goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}`)}
+						onclick={() => { goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}`); onNavigate?.(); }}
 						class="mb-1 w-full rounded-md px-3 py-2 text-left hover:bg-bg-primary"
 					>
 						<div class="truncate text-sm text-text-primary">
@@ -195,7 +197,7 @@
 					<h3 class="px-3 py-1 text-xs font-medium text-text-secondary">{group.label}</h3>
 					{#each group.conversations as conv}
 						<button
-							onclick={() => goto(`/chat/${conv.uuid}`)}
+							onclick={() => { goto(`/chat/${conv.uuid}`); onNavigate?.(); }}
 							class="w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors {currentUuid === conv.uuid
 								? 'bg-bg-primary text-text-primary'
 								: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"
@@ -206,7 +208,15 @@
 				</div>
 			{/each}
 
-			{#if loading}
+			{#if loading && conversations.length === 0}
+				<div class="space-y-1 px-1">
+					{#each Array(12) as _}
+						<div class="rounded-md px-3 py-2">
+							<div class="skeleton h-4 w-full"></div>
+						</div>
+					{/each}
+				</div>
+			{:else if loading}
 				<div class="py-4 text-center text-sm text-text-secondary">로딩 중...</div>
 			{/if}
 
@@ -218,7 +228,7 @@
 
 	<div class="border-t border-border p-2">
 		<button
-			onclick={() => goto('/projects')}
+			onclick={() => { goto('/projects'); onNavigate?.(); }}
 			class="w-full rounded-md px-3 py-1.5 text-left text-sm text-text-secondary hover:bg-bg-primary hover:text-text-primary"
 		>
 			📁 프로젝트
