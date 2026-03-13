@@ -82,6 +82,14 @@ Sorted by implementation priority (dependency order).
 - [x] **11.4 Fix incorrect `rb` highlight.js alias** — `rb` (Ruby file extension) was incorrectly aliased to `rust`. Removed the alias since Ruby is not in the registered languages. Ruby code blocks tagged as `rb` will now fall back to auto-detection instead of being misclassified as Rust.
 - [x] **11.5 Search results infinite scroll** — Search UI previously fetched only the first 20 results with no way to load more. Added offset-based pagination to search: `handleScroll` now triggers `loadMoreSearchResults()` when in search mode, appending additional pages. Includes loading indicator and proper state reset on clear.
 
+## Phase 12: Remaining Should-Have Items
+
+- [x] **12.1 Ingest progress counter** — Added per-conversation progress display (`Processing conversations: N/total`) to `scripts/ingest.ts`. Updates every 100 conversations and at completion. Uses `\r` for in-place terminal updates.
+
+### Remaining Should-Have Gaps (Low Priority)
+
+- **Chat view skeleton UI** — Spec lists "메시지 로딩 시 스켈레톤 UI" as Should Have, but with server-side rendering (SSR) in Phase 10, chat data loads before the page renders — no client-side loading state occurs. This is effectively unnecessary.
+
 ### Spec Divergences (Intentional)
 
 - **`highlight_ranges` in search API response** — Spec defines this field but it's unnecessary; the frontend uses FTS5 `<mark>` tags in the snippet string directly, which is simpler and sufficient.

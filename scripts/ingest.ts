@@ -107,6 +107,7 @@ function hasToolUse(content: ContentBlock[]): boolean {
 function ingestConversations(db: Database.Database, filePath: string): { conversations: number; messages: number } {
 	const raw = fs.readFileSync(filePath, 'utf-8');
 	const conversations: Conversation[] = JSON.parse(raw);
+	const total = conversations.length;
 
 	const insertConv = db.prepare(`
 		INSERT OR REPLACE INTO conversation (uuid, name, summary, created_at, updated_at)
@@ -132,6 +133,10 @@ function ingestConversations(db: Database.Database, filePath: string): { convers
 					conv.updated_at
 				);
 				convCount++;
+
+				if (convCount % 100 === 0 || convCount === total) {
+					process.stdout.write(`\r  Processing conversations: ${convCount}/${total}`);
+				}
 
 				if (!conv.chat_messages) continue;
 
@@ -162,6 +167,7 @@ function ingestConversations(db: Database.Database, filePath: string): { convers
 	});
 
 	ingestAll();
+	if (total > 0) console.log();
 	return { conversations: convCount, messages: msgCount };
 }
 
