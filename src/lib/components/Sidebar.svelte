@@ -32,12 +32,17 @@
 	let hasMore = $state(true);
 	let loading = $state(false);
 	let searchTotal = $state(0);
+	let selectedIndex = $state(-1);
 	let debounceTimer: ReturnType<typeof setTimeout>;
 	let listEl: HTMLElement;
 	let searchInputEl: HTMLInputElement;
 
 	export function focusSearch() {
 		searchInputEl?.focus();
+	}
+
+	export function clearSearchState() {
+		clearSearch();
 	}
 
 	const currentUuid = $derived($page.params?.uuid || '');
@@ -75,6 +80,7 @@
 
 	function handleSearchInput() {
 		clearTimeout(debounceTimer);
+		selectedIndex = -1;
 		if (searchQuery.length < 2) {
 			isSearching = false;
 			searchResults = [];
@@ -93,6 +99,41 @@
 		searchQuery = '';
 		isSearching = false;
 		searchResults = [];
+		selectedIndex = -1;
+	}
+
+	function handleSearchKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			clearSearch();
+			return;
+		}
+
+		if (!isSearching || searchResults.length === 0) return;
+
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			selectedIndex = selectedIndex < searchResults.length - 1 ? selectedIndex + 1 : 0;
+			scrollSelectedIntoView();
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : searchResults.length - 1;
+			scrollSelectedIntoView();
+		} else if (e.key === 'Enter') {
+			e.preventDefault();
+			const idx = selectedIndex >= 0 ? selectedIndex : 0;
+			const result = searchResults[idx];
+			if (result) {
+				goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`);
+				onNavigate?.();
+			}
+		}
+	}
+
+	function scrollSelectedIntoView() {
+		requestAnimationFrame(() => {
+			const el = listEl?.querySelector(`[data-result-index="${selectedIndex}"]`);
+			el?.scrollIntoView({ block: 'nearest' });
+		});
 	}
 
 	function getDisplayName(conv: Conversation): string {
@@ -153,7 +194,7 @@
 				bind:value={searchQuery}
 				bind:this={searchInputEl}
 				oninput={handleSearchInput}
-				onkeydown={(e) => { if (e.key === 'Escape') clearSearch(); }}
+				onkeydown={handleSearchKeydown}
 				class="w-full rounded-md border border-border bg-bg-primary px-3 py-1.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
 			/>
 			{#if searchQuery}
@@ -177,10 +218,11 @@
 				<p class="px-3 py-4 text-center text-sm text-text-secondary">검색 결과가 없습니다</p>
 			{:else}
 				<p class="px-3 py-1 text-xs text-text-secondary">{searchTotal}개 결과</p>
-				{#each searchResults as result}
+				{#each searchResults as result, i}
 					<button
-						onclick={() => { goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}`); onNavigate?.(); }}
-						class="mb-1 w-full rounded-md px-3 py-2 text-left hover:bg-bg-primary"
+						data-result-index={i}
+						onclick={() => { goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`); onNavigate?.(); }}
+						class="mb-1 w-full rounded-md px-3 py-2 text-left {selectedIndex === i ? 'bg-bg-primary ring-1 ring-accent' : 'hover:bg-bg-primary'}"
 					>
 						<div class="truncate text-sm text-text-primary">
 							{result.conversation_name || '(제목 없음)'}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { renderMarkdown } from '$lib/markdown';
 
 	let { data }: { data: PageData } = $props();
 
@@ -97,7 +98,9 @@
 											<summary class="cursor-pointer text-sm text-accent hover:underline">
 												{doc.filename}
 											</summary>
-											<pre class="mt-2 max-h-[400px] overflow-auto rounded-lg bg-code-bg p-4"><code class="text-xs text-text-primary">{doc.content}</code></pre>
+											<div class="mt-2 max-h-[400px] overflow-auto rounded-lg bg-code-bg p-4 text-xs text-text-primary markdown-doc">
+												{@html renderMarkdown(doc.content)}
+											</div>
 										</details>
 									{/each}
 								{/if}
@@ -109,3 +112,28 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.markdown-doc :global(h1) { font-size: 1.3em; font-weight: 700; margin: 0.5em 0; }
+	.markdown-doc :global(h2) { font-size: 1.15em; font-weight: 700; margin: 0.4em 0; }
+	.markdown-doc :global(h3) { font-size: 1.05em; font-weight: 600; margin: 0.3em 0; }
+	.markdown-doc :global(ul) { list-style-type: disc; padding-left: 1.5em; margin: 0.3em 0; }
+	.markdown-doc :global(ol) { list-style-type: decimal; padding-left: 1.5em; margin: 0.3em 0; }
+	.markdown-doc :global(li) { margin: 0.1em 0; }
+	.markdown-doc :global(p) { margin: 0.3em 0; }
+	.markdown-doc :global(blockquote) {
+		border-left: 3px solid var(--border);
+		padding-left: 1em;
+		margin: 0.4em 0;
+		color: var(--text-secondary);
+	}
+	.markdown-doc :global(pre) {
+		margin: 0.4em 0;
+		border-radius: 0.375rem;
+		overflow-x: auto;
+	}
+	.markdown-doc :global(code) { font-size: 0.85em; }
+	.markdown-doc :global(hr) { border: none; border-top: 1px solid var(--border); margin: 0.8em 0; }
+	.markdown-doc :global(a) { color: var(--accent); text-decoration: underline; }
+	.markdown-doc :global(strong) { font-weight: 700; }
+</style>

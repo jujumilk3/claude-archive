@@ -72,3 +72,22 @@ export function renderMarkdown(text: string): string {
 	if (typeof result === 'string') return result;
 	return '';
 }
+
+export function highlightSearchTerms(html: string, query: string): string {
+	if (!query || query.length < 2) return html;
+
+	const terms = query
+		.split(/\s+/)
+		.filter((t) => t.length >= 2)
+		.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+	if (terms.length === 0) return html;
+
+	const pattern = new RegExp(`(${terms.join('|')})`, 'gi');
+
+	// Only highlight text nodes (outside of HTML tags)
+	return html.replace(/(<[^>]*>)|([^<]+)/g, (match, tag, text) => {
+		if (tag) return tag;
+		return text.replace(pattern, '<mark class="search-highlight">$1</mark>');
+	});
+}

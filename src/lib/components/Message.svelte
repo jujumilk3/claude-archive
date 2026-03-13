@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { renderMarkdown } from '$lib/markdown';
+	import { renderMarkdown, highlightSearchTerms } from '$lib/markdown';
 
 	interface ContentBlock {
 		type: 'text' | 'tool_use' | 'tool_result';
@@ -17,9 +17,10 @@
 		text: string;
 		createdAt?: string;
 		highlighted?: boolean;
+		searchQuery?: string;
 	}
 
-	let { uuid, sender, contentJson, text, createdAt, highlighted = false }: Props = $props();
+	let { uuid, sender, contentJson, text, createdAt, highlighted = false, searchQuery = '' }: Props = $props();
 
 	const formattedTime = $derived(
 		createdAt
@@ -41,6 +42,14 @@
 			return [{ type: 'text' as const, text }];
 		}
 	})());
+
+	function renderText(t: string): string {
+		const html = renderMarkdown(t);
+		if (searchQuery) {
+			return highlightSearchTerms(html, searchQuery);
+		}
+		return html;
+	}
 
 	function getToolResultText(block: ContentBlock): string {
 		if (typeof block.content === 'string') return block.content;
@@ -78,7 +87,7 @@
 		{#each content as block}
 			{#if block.type === 'text' && block.text}
 				<div class="markdown-body text-sm leading-relaxed">
-					{@html renderMarkdown(block.text)}
+					{@html renderText(block.text)}
 				</div>
 			{:else if block.type === 'tool_use'}
 				<details class="my-2 rounded-lg border border-border">
@@ -140,6 +149,14 @@
 	.markdown-body :global(p:last-child) { margin-bottom: 0; }
 	.markdown-body :global(hr) { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
 	.markdown-body :global(strong) { font-weight: 700; }
+
+	/* Search highlight styling */
+	.msg-bubble :global(.search-highlight) {
+		background-color: rgba(218, 119, 86, 0.4);
+		color: inherit;
+		padding: 0 1px;
+		border-radius: 2px;
+	}
 
 	/* Code block line numbers */
 	.msg-bubble :global(.code-line) {

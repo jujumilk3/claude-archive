@@ -52,6 +52,12 @@
 				sidebarRef?.focusSearch();
 			});
 		}
+		if (e.key === 'Escape') {
+			if (isMobile && !sidebarCollapsed) {
+				sidebarCollapsed = true;
+			}
+			sidebarRef?.clearSearchState();
+		}
 	}
 </script>
 

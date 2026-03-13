@@ -24,6 +24,7 @@
 	let loading = $state(true);
 	let errorMsg = $state('');
 	let highlightUuid = $state('');
+	let searchQuery = $state('');
 
 	const uuid = $derived($page.params.uuid);
 
@@ -53,6 +54,9 @@
 			messages = data.messages;
 
 			const highlight = $page.url.searchParams.get('highlight');
+			const q = $page.url.searchParams.get('q');
+			searchQuery = q || '';
+
 			if (highlight) {
 				highlightUuid = highlight;
 				requestAnimationFrame(() => {
@@ -118,6 +122,7 @@
 							text={msg.text}
 							createdAt={msg.created_at}
 							highlighted={highlightUuid === msg.uuid}
+							{searchQuery}
 						/>
 					{/each}
 				{/if}
