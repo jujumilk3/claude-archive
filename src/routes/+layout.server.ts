@@ -10,7 +10,7 @@ export const load: LayoutServerLoad = () => {
 		return {
 			initialConversations: conversations,
 			totalConversations: total,
-			hasMoreConversations: total > 50
+			hasMoreConversations: total > conversations.length
 		};
 	} catch (e) {
 		console.error('Failed to load conversations:', e);

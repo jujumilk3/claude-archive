@@ -124,3 +124,44 @@ export function getProjectDocs(projectUuid: string): ProjectDoc[] {
 		)
 		.all(projectUuid) as ProjectDoc[];
 }
+
+export interface SearchResult {
+	message_uuid: string;
+	conversation_uuid: string;
+	conversation_name: string;
+	snippet: string;
+	message_sender: string;
+	created_at: string;
+}
+
+const SEARCH_SQL = `SELECT
+	m.uuid as message_uuid,
+	m.conversation_uuid,
+	CASE WHEN c.name != '' THEN c.name
+		ELSE COALESCE(
+			(SELECT SUBSTR(m2.text, 1, 50)
+			 FROM message m2
+			 WHERE m2.conversation_uuid = c.uuid AND m2.sender = 'human'
+			 ORDER BY m2.message_order LIMIT 1),
+			''
+		)
+	END as conversation_name,
+	snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet,
+	m.sender as message_sender,
+	m.created_at
+FROM message_fts
+JOIN message m ON m.rowid = message_fts.rowid
+JOIN conversation c ON c.uuid = m.conversation_uuid
+WHERE message_fts MATCH ?
+ORDER BY rank
+LIMIT ? OFFSET ?`;
+
+export function searchMessages(ftsQuery: string, offset = 0, limit = 20): { results: SearchResult[]; total: number } {
+	const db = getDb();
+	const countResult = db
+		.prepare('SELECT COUNT(*) as count FROM message_fts WHERE message_fts MATCH ?')
+		.get(ftsQuery) as { count: number } | undefined;
+	const total = countResult?.count ?? 0;
+	const results = db.prepare(SEARCH_SQL).all(ftsQuery, limit, offset) as SearchResult[];
+	return { results, total };
+}

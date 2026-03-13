@@ -113,4 +113,21 @@ describe('renderMarkdown', () => {
 		expect(result).toContain('item 1');
 		expect(result).toContain('item 2');
 	});
+
+	it('blocks javascript: URIs in links', () => {
+		const result = renderMarkdown('[click](javascript:alert(1))');
+		expect(result).not.toContain('javascript:');
+		expect(result).toContain('href="#"');
+	});
+
+	it('blocks JavaScript: URIs case-insensitively', () => {
+		const result = renderMarkdown('[click](JAVASCRIPT:void(0))');
+		expect(result).not.toContain('JAVASCRIPT:');
+		expect(result).toContain('href="#"');
+	});
+
+	it('allows normal http links', () => {
+		const result = renderMarkdown('[click](https://example.com)');
+		expect(result).toContain('href="https://example.com"');
+	});
 });

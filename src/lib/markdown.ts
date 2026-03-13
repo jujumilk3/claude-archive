@@ -90,7 +90,8 @@ const marked = new Marked({
 			return `<code class="rounded bg-code-bg px-1 py-0.5 text-sm">${text}</code>`;
 		},
 		link({ href, text }: { href: string; text: string }) {
-			return `<a href="${href}" class="text-accent underline" target="_blank" rel="noopener">${text}</a>`;
+			const safeHref = /^javascript:/i.test(href) ? '#' : href;
+			return `<a href="${safeHref}" class="text-accent underline" target="_blank" rel="noopener">${text}</a>`;
 		},
 		table(token) {
 			const headerCells = token.header

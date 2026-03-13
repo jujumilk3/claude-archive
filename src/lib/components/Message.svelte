@@ -113,11 +113,10 @@
 		const target = e.target as HTMLElement;
 		if (target.classList.contains('copy-btn')) {
 			const code = target.dataset.code || '';
-			navigator.clipboard.writeText(code);
-			const original = target.textContent;
+			navigator.clipboard.writeText(code).catch(() => {});
 			target.textContent = 'Copied!';
 			setTimeout(() => {
-				target.textContent = original;
+				target.textContent = 'Copy';
 			}, 1500);
 		}
 	}
@@ -145,7 +144,7 @@
 					<details class="w-full rounded-lg border border-border">
 						<summary class="flex cursor-pointer items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
 							<span>📎 {att.file_name}</span>
-							{#if att.file_size}
+							{#if att.file_size != null}
 								<span class="opacity-60">({formatFileSize(att.file_size)})</span>
 							{/if}
 						</summary>
@@ -203,6 +202,13 @@
 						📋 Result{block.is_error ? ' (error)' : ''}{block.name ? `: ${block.name}` : ''}
 					</summary>
 					<pre class="max-h-[300px] overflow-auto border-t border-border p-3"><code class="text-xs text-text-secondary">{getToolResultText(block)}</code></pre>
+				</details>
+			{:else if block.type !== 'text' && block.type !== 'thinking'}
+				<details class="my-2 rounded-lg border border-border">
+					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
+						📦 {block.type}{block.name ? `: ${block.name}` : ''}
+					</summary>
+					<pre class="max-h-[300px] overflow-auto border-t border-border p-3"><code class="text-xs text-text-secondary">{JSON.stringify(block, null, 2)}</code></pre>
 				</details>
 			{/if}
 		{/each}

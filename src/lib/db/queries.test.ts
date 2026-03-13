@@ -212,4 +212,45 @@ describe('data access layer', () => {
 		expect(doc).toHaveProperty('content');
 		expect(doc).toHaveProperty('created_at');
 	});
+
+	it('searchMessages returns results matching FTS query', async () => {
+		const { searchMessages } = await import('./queries');
+		const { results, total } = searchMessages('"Hello"');
+
+		expect(total).toBeGreaterThan(0);
+		expect(results.length).toBeGreaterThan(0);
+		expect(results[0]).toHaveProperty('message_uuid');
+		expect(results[0]).toHaveProperty('conversation_uuid');
+		expect(results[0]).toHaveProperty('conversation_name');
+		expect(results[0]).toHaveProperty('snippet');
+		expect(results[0]).toHaveProperty('message_sender');
+		expect(results[0]).toHaveProperty('created_at');
+	});
+
+	it('searchMessages returns conversation name fallback for unnamed conversations', async () => {
+		const { searchMessages } = await import('./queries');
+		const { results } = searchMessages('"unnamed"');
+
+		const match = results.find((r) => r.conversation_uuid === 'conv-b');
+		if (match) {
+			expect(match.conversation_name).toBe('First message in unnamed conv');
+		}
+	});
+
+	it('searchMessages respects offset and limit', async () => {
+		const { searchMessages } = await import('./queries');
+		const all = searchMessages('"Hello"', 0, 100);
+		const limited = searchMessages('"Hello"', 0, 1);
+
+		expect(limited.results.length).toBeLessThanOrEqual(1);
+		expect(limited.total).toBe(all.total);
+	});
+
+	it('searchMessages returns zero results for non-matching query', async () => {
+		const { searchMessages } = await import('./queries');
+		const { results, total } = searchMessages('"zzzznonexistent"');
+
+		expect(results).toEqual([]);
+		expect(total).toBe(0);
+	});
 });
