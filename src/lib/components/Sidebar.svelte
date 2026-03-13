@@ -33,9 +33,42 @@
 	let loading = $state(false);
 	let searchTotal = $state(0);
 	let selectedIndex = $state(-1);
+	let searchFocused = $state(false);
+	let searchHistory: string[] = $state(loadSearchHistory());
 	let debounceTimer: ReturnType<typeof setTimeout>;
 	let listEl: HTMLElement;
 	let searchInputEl: HTMLInputElement;
+
+	const SEARCH_HISTORY_KEY = 'claude-archive-search-history';
+	const MAX_HISTORY = 10;
+
+	function loadSearchHistory(): string[] {
+		if (typeof localStorage === 'undefined') return [];
+		try {
+			return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
+		} catch {
+			return [];
+		}
+	}
+
+	function saveSearchTerm(term: string) {
+		const trimmed = term.trim();
+		if (trimmed.length < 2) return;
+		searchHistory = [trimmed, ...searchHistory.filter((t) => t !== trimmed)].slice(0, MAX_HISTORY);
+		localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+	}
+
+	function removeHistoryItem(term: string) {
+		searchHistory = searchHistory.filter((t) => t !== term);
+		localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+	}
+
+	function useHistoryItem(term: string) {
+		searchQuery = term;
+		handleSearchInput();
+	}
+
+	const showHistory = $derived(searchFocused && !searchQuery && searchHistory.length > 0 && !isSearching);
 
 	export function focusSearch() {
 		searchInputEl?.focus();
@@ -123,6 +156,7 @@
 			const idx = selectedIndex >= 0 ? selectedIndex : 0;
 			const result = searchResults[idx];
 			if (result) {
+				saveSearchTerm(searchQuery);
 				goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`);
 				onNavigate?.();
 			}
@@ -195,6 +229,8 @@
 				bind:this={searchInputEl}
 				oninput={handleSearchInput}
 				onkeydown={handleSearchKeydown}
+				onfocus={() => searchFocused = true}
+				onblur={() => setTimeout(() => searchFocused = false, 150)}
 				class="w-full rounded-md border border-border bg-bg-primary px-3 py-1.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
 			/>
 			{#if searchQuery}
@@ -204,6 +240,29 @@
 				>
 					✕
 				</button>
+			{/if}
+			{#if showHistory}
+				<div class="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-border bg-bg-sidebar py-1 shadow-lg">
+					<div class="flex items-center justify-between px-3 py-1">
+						<span class="text-xs text-text-secondary">최근 검색</span>
+					</div>
+					{#each searchHistory as term}
+						<div class="group flex items-center">
+							<button
+								onclick={() => useHistoryItem(term)}
+								class="flex-1 truncate px-3 py-1 text-left text-sm text-text-secondary hover:bg-bg-primary hover:text-text-primary"
+							>
+								{term}
+							</button>
+							<button
+								onclick={() => removeHistoryItem(term)}
+								class="mr-2 hidden text-xs text-text-secondary hover:text-text-primary group-hover:block"
+							>
+								✕
+							</button>
+						</div>
+					{/each}
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -221,7 +280,7 @@
 				{#each searchResults as result, i}
 					<button
 						data-result-index={i}
-						onclick={() => { goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`); onNavigate?.(); }}
+						onclick={() => { saveSearchTerm(searchQuery); goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`); onNavigate?.(); }}
 						class="mb-1 w-full rounded-md px-3 py-2 text-left {selectedIndex === i ? 'bg-bg-primary ring-1 ring-accent' : 'hover:bg-bg-primary'}"
 					>
 						<div class="truncate text-sm text-text-primary">

@@ -65,7 +65,7 @@ Sorted by implementation priority (dependency order).
 ## Phase 9: Spec Compliance — Should-Have Gaps
 
 - [x] **9.1 Project doc markdown rendering** — Doc content rendered via `renderMarkdown()` instead of raw `<pre><code>`. Includes scoped markdown styles.
-- [ ] **9.2 Search history** — Remember recent search terms.
+- [x] **9.2 Search history** — Remember recent search terms. Stored in localStorage (`claude-archive-search-history`), max 10 items. Dropdown appears when search input is focused with empty query. Individual items can be removed.
 - [x] **9.3 Global Escape key** — Escape dismisses sidebar overlay on mobile and clears search from anywhere via `clearSearchState()` on Sidebar.
 
 ---
