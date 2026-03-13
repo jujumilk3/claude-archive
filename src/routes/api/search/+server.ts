@@ -1,10 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/db';
+import { escapeFts5Query } from '$lib/search';
 
-function escapeFts5Query(query: string): string {
-	return query.replace(/['"*()[\]{}\-:^~+.]/g, ' ').trim();
-}
 
 export const GET: RequestHandler = ({ url }) => {
 	const q = url.searchParams.get('q') || '';
