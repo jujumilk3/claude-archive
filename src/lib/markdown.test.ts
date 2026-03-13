@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { highlightSearchTerms } from './markdown';
+import { highlightSearchTerms, renderMarkdown } from './markdown';
 
 describe('highlightSearchTerms', () => {
 	it('wraps matching terms in mark tags', () => {
@@ -33,5 +33,24 @@ describe('highlightSearchTerms', () => {
 	it('escapes regex special characters in query', () => {
 		const result = highlightSearchTerms('<p>price is $10.00</p>', '$10');
 		expect(result).toContain('<mark class="search-highlight">$10</mark>');
+	});
+});
+
+describe('renderMarkdown', () => {
+	it('shows specified language label in code blocks', () => {
+		const result = renderMarkdown('```python\nprint("hello")\n```');
+		expect(result).toContain('>python<');
+	});
+
+	it('shows auto-detected language label for unlabeled code blocks', () => {
+		const result = renderMarkdown('```\nfunction foo() { return 42; }\n```');
+		expect(result).not.toContain('>code<');
+	});
+
+	it('auto-detects language when fence label is not recognized', () => {
+		const result = renderMarkdown('```unknownlang\nsome content\n```');
+		// hljs auto-detects a language since 'unknownlang' is not registered
+		expect(result).not.toContain('>code<');
+		expect(result).not.toContain('>unknownlang<');
 	});
 });

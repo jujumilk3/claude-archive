@@ -55,10 +55,16 @@ const marked = new Marked({
 	renderer: {
 		code({ text, lang }: { text: string; lang?: string }) {
 			const language = lang && hljs.getLanguage(lang) ? lang : undefined;
-			const highlighted = language
-				? hljs.highlight(text, { language }).value
-				: hljs.highlightAuto(text).value;
-			const detectedLang = language || lang || 'code';
+			let highlighted: string;
+			let detectedLang: string;
+			if (language) {
+				highlighted = hljs.highlight(text, { language }).value;
+				detectedLang = language;
+			} else {
+				const result = hljs.highlightAuto(text);
+				highlighted = result.value;
+				detectedLang = result.language || lang || 'code';
+			}
 
 			const lines = highlighted.split('\n');
 			// Remove trailing empty line that fenced blocks often have
