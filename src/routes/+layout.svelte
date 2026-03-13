@@ -76,7 +76,6 @@
 			<div class="fixed inset-y-0 left-0 z-40 w-[260px]">
 				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
 				initialConversations={data.initialConversations}
-				totalConversations={data.totalConversations}
 				hasMoreInitial={data.hasMoreConversations} />
 			</div>
 		{/if}
@@ -87,7 +86,6 @@
 		>
 			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
 				initialConversations={data.initialConversations}
-				totalConversations={data.totalConversations}
 				hasMoreInitial={data.hasMoreConversations} />
 		</div>
 	{/if}
@@ -97,6 +95,7 @@
 			onclick={toggleSidebar}
 			class="absolute left-3 top-3 z-10 rounded-md p-1.5 text-text-secondary hover:bg-bg-sidebar hover:text-text-primary"
 			title={sidebarCollapsed ? '사이드바 열기 (⌘B)' : '사이드바 닫기 (⌘B)'}
+			aria-label={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
 		>
 			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<path d="M3 12h18M3 6h18M3 18h18" />

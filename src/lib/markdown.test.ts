@@ -60,7 +60,20 @@ describe('renderMarkdown', () => {
 
 	it('renders inline code with codespan styling', () => {
 		const result = renderMarkdown('use `foo()` here');
-		expect(result).toContain('<code class="rounded bg-code-bg px-1 py-0.5 text-sm">foo()</code>');
+		expect(result).toContain('<code class="rounded bg-code-bg px-1 py-0.5 text-sm">');
+		expect(result).toContain('foo()');
+	});
+
+	it('escapes HTML in inline code spans to prevent XSS', () => {
+		const result = renderMarkdown('use `<img onerror=alert(1)>` here');
+		expect(result).not.toMatch(/<img[^>]*onerror/);
+		expect(result).toContain('&lt;img');
+	});
+
+	it('escapes angle brackets in inline code spans', () => {
+		const result = renderMarkdown('type `Array<string>` here');
+		expect(result).toContain('&lt;string&gt;');
+		expect(result).not.toContain('<string>');
 	});
 
 	it('renders links with target _blank and rel noopener', () => {

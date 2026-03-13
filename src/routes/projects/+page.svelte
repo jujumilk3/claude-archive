@@ -30,8 +30,14 @@
 
 		try {
 			const res = await fetch(`/api/projects/${uuid}`);
-			const data = await res.json();
-			docs = data.docs;
+			if (!res.ok) {
+				docs = [];
+				return;
+			}
+			const result = await res.json();
+			docs = result.docs ?? [];
+		} catch {
+			docs = [];
 		} finally {
 			loadingDocs = false;
 		}
@@ -46,12 +52,14 @@
 				<input
 					type="text"
 					placeholder="프로젝트 검색..."
+					aria-label="프로젝트 검색"
 					bind:value={filterQuery}
 					class="w-full rounded-md border border-border bg-bg-sidebar px-3 py-1 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
 				/>
 				{#if filterQuery}
 					<button
 						onclick={() => (filterQuery = '')}
+						aria-label="검색 지우기"
 						class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
 					>✕</button>
 				{/if}

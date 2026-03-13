@@ -87,7 +87,7 @@ const marked = new Marked({
 			</div>`;
 		},
 		codespan({ text }: { text: string }) {
-			return `<code class="rounded bg-code-bg px-1 py-0.5 text-sm">${text}</code>`;
+			return `<code class="rounded bg-code-bg px-1 py-0.5 text-sm">${escapeAttr(text)}</code>`;
 		},
 		link({ href, text }: { href: string; text: string }) {
 			const safeHref = /^javascript:/i.test(href) ? '#' : escapeAttr(href);

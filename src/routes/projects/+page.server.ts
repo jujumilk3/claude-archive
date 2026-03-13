@@ -7,6 +7,7 @@ export const load: PageServerLoad = () => {
 		const projects = getProjectList();
 		return { projects };
 	} catch (e) {
+		if (typeof e === 'object' && e !== null && 'status' in e) throw e;
 		console.error('Failed to load projects:', e);
 		error(500, 'Failed to load projects');
 	}

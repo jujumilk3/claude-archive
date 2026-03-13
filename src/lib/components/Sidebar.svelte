@@ -26,12 +26,10 @@
 	let {
 		onNavigate,
 		initialConversations = [],
-		totalConversations = 0,
 		hasMoreInitial = true
 	}: {
 		onNavigate?: () => void;
 		initialConversations?: Conversation[];
-		totalConversations?: number;
 		hasMoreInitial?: boolean;
 	} = $props();
 
@@ -278,6 +276,7 @@
 			<input
 				type="text"
 				placeholder="검색... (⌘K)"
+				aria-label="대화 검색"
 				bind:value={searchQuery}
 				bind:this={searchInputEl}
 				oninput={handleSearchInput}
@@ -289,6 +288,7 @@
 			{#if searchQuery}
 				<button
 					onclick={clearSearch}
+					aria-label="검색 지우기"
 					class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
 				>
 					✕

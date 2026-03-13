@@ -12,6 +12,7 @@ export const load: LayoutServerLoad = () => {
 			hasMoreConversations: total > conversations.length
 		};
 	} catch (e) {
+		if (typeof e === 'object' && e !== null && 'status' in e) throw e;
 		console.error('Failed to load conversations:', e);
 		error(500, 'Failed to load conversations');
 	}
