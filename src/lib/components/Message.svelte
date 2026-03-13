@@ -59,6 +59,8 @@
 		return '';
 	}
 
+	let bubbleEl: HTMLDivElement;
+
 	function handleClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
 		if (target.classList.contains('copy-btn')) {
@@ -71,18 +73,23 @@
 			}, 1500);
 		}
 	}
+
+	$effect(() => {
+		if (!bubbleEl) return;
+		bubbleEl.addEventListener('click', handleClick);
+		return () => bubbleEl.removeEventListener('click', handleClick);
+	});
 </script>
 
 <div
 	id="msg-{uuid}"
 	class="msg-wrapper group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
 >
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
+		bind:this={bubbleEl}
 		class="msg-bubble max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
 			? 'bg-bg-message-human text-text-primary'
 			: 'text-text-primary'}"
-		onclick={handleClick}
 	>
 		{#each content as block}
 			{#if block.type === 'text' && block.text}
