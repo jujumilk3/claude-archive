@@ -45,7 +45,6 @@ hljs.registerAliases(['sh', 'zsh'], { languageName: 'bash' });
 hljs.registerAliases(['js', 'jsx'], { languageName: 'javascript' });
 hljs.registerAliases(['ts', 'tsx'], { languageName: 'typescript' });
 hljs.registerAliases(['py'], { languageName: 'python' });
-hljs.registerAliases(['rb'], { languageName: 'rust' });
 hljs.registerAliases(['html', 'svg'], { languageName: 'xml' });
 hljs.registerAliases(['yml'], { languageName: 'yaml' });
 hljs.registerAliases(['toml'], { languageName: 'ini' });
