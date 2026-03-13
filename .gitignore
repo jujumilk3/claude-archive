@@ -1,1 +1,8 @@
 temp-data/
+node_modules/
+.svelte-kit/
+data/
+ralph-working-records/
+build/
+dist/
+*.db
