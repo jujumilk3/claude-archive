@@ -5,6 +5,7 @@
 	interface Conversation {
 		uuid: string;
 		name: string;
+		summary: string;
 		first_message_preview: string | null;
 		updated_at: string;
 	}
@@ -356,6 +357,7 @@
 					{#each group.conversations as conv}
 						<button
 							onclick={() => { goto(`/chat/${conv.uuid}`); onNavigate?.(); }}
+							title={conv.summary || undefined}
 							class="w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors {currentUuid === conv.uuid
 								? 'bg-bg-primary text-text-primary'
 								: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"

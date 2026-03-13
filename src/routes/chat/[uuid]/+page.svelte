@@ -39,6 +39,9 @@
 			<h1 class="text-lg font-medium text-text-primary">
 				{data.conversation.name || '(제목 없음)'}
 			</h1>
+			{#if data.conversation.summary}
+				<p class="mt-1 line-clamp-2 text-sm text-text-secondary">{data.conversation.summary}</p>
+			{/if}
 		</div>
 	</header>
 
