@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.27`.
+All phases implemented. Tagged at `0.0.28`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -27,6 +27,7 @@ All phases implemented. Tagged at `0.0.27`.
 - **Phase 17: Search Test Coverage** — Extracted `escapeFts5Query` to `src/lib/search.ts`, added 17 tests for FTS5 query escaping and search integration (special chars, Korean text, phrase matching, snippet generation, joined queries)
 - **Phase 18: Layout Spec Compliance** — Sidebar slide animation on desktop (CSS width transition instead of conditional render), chat header max-width aligned with message area (768px centered)
 - **Phase 19: Bug Fixes** — Search fetch error handling (try/catch in debounced search), ⌘K focus timing (wait for sidebar transition before focusing), files display when attachments also present, highlight animation replay for same message
+- **Phase 20: Data Access Layer** — Extracted duplicated SQL queries into `src/lib/db/queries.ts` shared module with typed interfaces; eliminated query drift risk between SSR layout loads and API routes for conversations, messages, and projects
 
 ## Notes
 
