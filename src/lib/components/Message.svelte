@@ -97,7 +97,7 @@
 
 <div
 	id="msg-{uuid}"
-	class="group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
+	class="msg-wrapper group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
 >
 	<div
 		class="max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
@@ -158,5 +158,9 @@
 	}
 	.animate-highlight {
 		animation: highlight-fade 2s ease-out;
+	}
+	.msg-wrapper {
+		content-visibility: auto;
+		contain-intrinsic-size: auto 120px;
 	}
 </style>
