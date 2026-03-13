@@ -77,6 +77,17 @@ export function getConversationList(offset = 0, limit = 50): ConversationSummary
 	return db.prepare(CONVERSATION_LIST_SQL).all(limit, offset) as ConversationSummary[];
 }
 
+export function getConversationListWithCount(offset = 0, limit = 50): { conversations: ConversationSummary[]; total: number } {
+	const db = getDb();
+	const query = db.transaction(() => {
+		const countResult = db.prepare('SELECT COUNT(*) as count FROM conversation').get() as { count: number };
+		const total = countResult.count;
+		const conversations = db.prepare(CONVERSATION_LIST_SQL).all(limit, offset) as ConversationSummary[];
+		return { conversations, total };
+	});
+	return query();
+}
+
 export function getConversationByUuid(uuid: string): ConversationDetail | undefined {
 	const db = getDb();
 	return db

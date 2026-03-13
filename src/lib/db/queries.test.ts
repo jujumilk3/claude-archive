@@ -213,6 +213,24 @@ describe('data access layer', () => {
 		expect(doc).toHaveProperty('created_at');
 	});
 
+	it('getConversationListWithCount returns count and list in a single transaction', async () => {
+		const { getConversationListWithCount } = await import('./queries');
+		const { conversations, total } = getConversationListWithCount(0, 10);
+
+		expect(total).toBe(3);
+		expect(conversations).toHaveLength(3);
+		expect(conversations[0].uuid).toBe('conv-a');
+	});
+
+	it('getConversationListWithCount respects offset and limit', async () => {
+		const { getConversationListWithCount } = await import('./queries');
+		const { conversations, total } = getConversationListWithCount(1, 1);
+
+		expect(total).toBe(3);
+		expect(conversations).toHaveLength(1);
+		expect(conversations[0].uuid).toBe('conv-b');
+	});
+
 	it('searchMessages returns results matching FTS query', async () => {
 		const { searchMessages } = await import('./queries');
 		const { results, total } = searchMessages('"Hello"');

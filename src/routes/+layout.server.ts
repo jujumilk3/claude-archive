@@ -1,11 +1,10 @@
 import type { LayoutServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import { getConversationCount, getConversationList } from '$lib/db/queries';
+import { getConversationListWithCount } from '$lib/db/queries';
 
 export const load: LayoutServerLoad = () => {
 	try {
-		const total = getConversationCount();
-		const conversations = getConversationList(0, 50);
+		const { conversations, total } = getConversationListWithCount(0, 50);
 
 		return {
 			initialConversations: conversations,

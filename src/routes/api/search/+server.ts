@@ -28,6 +28,7 @@ export const GET: RequestHandler = ({ url }) => {
 			hasMore: offset + limit < total
 		});
 	} catch (e) {
+		if (typeof e === 'object' && e !== null && 'status' in e) throw e;
 		console.error('Search query failed:', e);
 		error(500, 'Internal server error');
 	}

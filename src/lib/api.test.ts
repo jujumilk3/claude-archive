@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('$lib/db/queries', () => ({
 	getConversationCount: vi.fn(),
 	getConversationList: vi.fn(),
+	getConversationListWithCount: vi.fn(),
 	getConversationByUuid: vi.fn(),
 	getMessagesByConversation: vi.fn(),
 	getProjectByUuid: vi.fn(),
@@ -43,20 +44,20 @@ async function parseJson(response: Response) {
 
 describe('GET /api/conversations', () => {
 	let GET: (event: { url: URL }) => Response;
-	let mockCount: ReturnType<typeof vi.fn>;
-	let mockList: ReturnType<typeof vi.fn>;
+	let mockListWithCount: ReturnType<typeof vi.fn>;
 
 	beforeEach(async () => {
 		vi.resetModules();
 
 		const queries = await import('$lib/db/queries');
-		mockCount = queries.getConversationCount as ReturnType<typeof vi.fn>;
-		mockList = queries.getConversationList as ReturnType<typeof vi.fn>;
+		mockListWithCount = queries.getConversationListWithCount as ReturnType<typeof vi.fn>;
 
-		mockCount.mockReturnValue(100);
-		mockList.mockReturnValue([
-			{ uuid: 'c1', name: 'Test', summary: '', created_at: '', updated_at: '', first_message_preview: null }
-		]);
+		mockListWithCount.mockReturnValue({
+			conversations: [
+				{ uuid: 'c1', name: 'Test', summary: '', created_at: '', updated_at: '', first_message_preview: null }
+			],
+			total: 100
+		});
 
 		const mod = await import('../routes/api/conversations/+server');
 		GET = mod.GET as unknown as (event: { url: URL }) => Response;
@@ -66,48 +67,48 @@ describe('GET /api/conversations', () => {
 		const res = GET({ url: makeUrl('/api/conversations') });
 		const data = await parseJson(res);
 
-		expect(mockList).toHaveBeenCalledWith(0, 50);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 50);
 		expect(data.total).toBe(100);
 		expect(data.conversations).toHaveLength(1);
 		expect(data.hasMore).toBe(true);
 	});
 
 	it('respects custom offset and limit params', async () => {
-		mockCount.mockReturnValue(200);
+		mockListWithCount.mockReturnValue({ conversations: [{ uuid: 'c1' }], total: 200 });
 		const res = GET({ url: makeUrl('/api/conversations', { offset: '20', limit: '30' }) });
 		const data = await parseJson(res);
 
-		expect(mockList).toHaveBeenCalledWith(20, 30);
+		expect(mockListWithCount).toHaveBeenCalledWith(20, 30);
 		expect(data.hasMore).toBe(true);
 	});
 
 	it('clamps negative offset to 0', async () => {
 		GET({ url: makeUrl('/api/conversations', { offset: '-5' }) });
-		expect(mockList).toHaveBeenCalledWith(0, 50);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 50);
 	});
 
 	it('clamps limit above 100 to 100', async () => {
 		GET({ url: makeUrl('/api/conversations', { limit: '500' }) });
-		expect(mockList).toHaveBeenCalledWith(0, 100);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 100);
 	});
 
 	it('treats limit=0 as default (0 is falsy, falls back to 50)', async () => {
 		GET({ url: makeUrl('/api/conversations', { limit: '0' }) });
-		expect(mockList).toHaveBeenCalledWith(0, 50);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 50);
 	});
 
 	it('handles NaN offset gracefully', async () => {
 		GET({ url: makeUrl('/api/conversations', { offset: 'abc' }) });
-		expect(mockList).toHaveBeenCalledWith(0, 50);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 50);
 	});
 
 	it('handles NaN limit gracefully', async () => {
 		GET({ url: makeUrl('/api/conversations', { limit: 'xyz' }) });
-		expect(mockList).toHaveBeenCalledWith(0, 50);
+		expect(mockListWithCount).toHaveBeenCalledWith(0, 50);
 	});
 
 	it('calculates hasMore=false when at end', async () => {
-		mockCount.mockReturnValue(1);
+		mockListWithCount.mockReturnValue({ conversations: [{ uuid: 'c1' }], total: 1 });
 		const res = GET({ url: makeUrl('/api/conversations', { offset: '0', limit: '50' }) });
 		const data = await parseJson(res);
 
@@ -115,7 +116,7 @@ describe('GET /api/conversations', () => {
 	});
 
 	it('throws 500 on database error', async () => {
-		mockCount.mockImplementation(() => { throw new Error('DB down'); });
+		mockListWithCount.mockImplementation(() => { throw new Error('DB down'); });
 
 		expect(() => GET({ url: makeUrl('/api/conversations') })).toThrow();
 		try {
@@ -123,6 +124,20 @@ describe('GET /api/conversations', () => {
 		} catch (e: unknown) {
 			const err = e as { status: number };
 			expect(err.status).toBe(500);
+		}
+	});
+
+	it('re-throws HttpError from error() call', async () => {
+		const httpError = new Error('Service error') as Error & { status: number };
+		httpError.status = 503;
+		mockListWithCount.mockImplementation(() => { throw httpError; });
+
+		try {
+			GET({ url: makeUrl('/api/conversations') });
+			expect.fail('should have thrown');
+		} catch (e: unknown) {
+			const err = e as { status: number };
+			expect(err.status).toBe(503);
 		}
 	});
 });
@@ -284,6 +299,20 @@ describe('GET /api/search', () => {
 		} catch (e: unknown) {
 			const err = e as { status: number };
 			expect(err.status).toBe(500);
+		}
+	});
+
+	it('re-throws HttpError from error() call', () => {
+		const httpError = new Error('Service error') as Error & { status: number };
+		httpError.status = 503;
+		mockSearch.mockImplementation(() => { throw httpError; });
+
+		try {
+			GET({ url: makeUrl('/api/search', { q: 'test' }) });
+			expect.fail('should have thrown');
+		} catch (e: unknown) {
+			const err = e as { status: number };
+			expect(err.status).toBe(503);
 		}
 	});
 });
