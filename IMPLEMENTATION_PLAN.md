@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.29`.
+All phases implemented. Tagged at `0.0.33`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -33,6 +33,7 @@ All phases implemented. Tagged at `0.0.29`.
 - **Phase 23: Hardening & Architecture** — Unknown content block type fallback rendering (displays raw JSON in collapsible); `javascript:` URI blocking in markdown links; copy button double-click fix; `file_size === 0` display fix; `hasMore` magic number fix in layout server load; extracted search SQL into shared `queries.ts` layer (`searchMessages`); expanded test suite from 58 to 65 tests
 - **Phase 24: Search Snippet XSS Fix** — FTS5 `snippet()` does not HTML-escape output; raw HTML in message text (e.g. `<script>`, `<img onerror=...>`) was rendered via `{@html}` in search results. Added `sanitizeSnippet()` to `src/lib/search.ts` that HTML-escapes snippet text while preserving `<mark>` tags. Applied in search API endpoint. Added 8 tests (unit + integration proving the XSS vector and fix). Test suite: 65 → 73 tests.
 - **Phase 25: Markdown XSS Hardening & Search Transaction** — Escaped `detectedLang` in code block renderer to prevent XSS via malicious fenced code block language labels. Escaped `href` attribute in link renderer to prevent attribute injection via URLs containing double quotes. Wrapped `searchMessages` count+results queries in a SQLite transaction to prevent TOCTOU inconsistency. Added 2 tests (language label XSS, href attribute injection). Test suite: 73 → 75 tests.
+- **Phase 26: API Route Handler Tests** — Added 25 tests for all 4 API endpoints (`/api/conversations`, `/api/conversations/:uuid/messages`, `/api/search`, `/api/projects/:uuid`). Tests cover parameter validation (offset/limit clamping, NaN handling), 404 responses for missing resources, 500 error handling, search query min-length guard, empty escaped query handling, FTS5 query wrapping, snippet sanitization, hasMore calculation, and response shape. Test suite: 75 → 100 tests.
 
 ## Notes
 
