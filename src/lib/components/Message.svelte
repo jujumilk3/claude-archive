@@ -2,12 +2,24 @@
 	import { renderMarkdown, highlightSearchTerms } from '$lib/markdown';
 
 	interface ContentBlock {
-		type: 'text' | 'tool_use' | 'tool_result';
+		type: string;
 		text?: string;
 		name?: string;
 		input?: Record<string, unknown>;
 		content?: Array<{ type: string; text: string }> | string;
 		is_error?: boolean;
+		thinking?: string;
+	}
+
+	interface Attachment {
+		file_name: string;
+		file_size?: number;
+		file_type?: string;
+		extracted_content?: string;
+	}
+
+	interface FileRef {
+		file_name: string;
 	}
 
 	interface Props {
@@ -16,11 +28,23 @@
 		contentJson: string;
 		text: string;
 		createdAt?: string;
+		attachmentsJson?: string;
+		filesJson?: string;
 		highlighted?: boolean;
 		searchQuery?: string;
 	}
 
-	let { uuid, sender, contentJson, text, createdAt, highlighted = false, searchQuery = '' }: Props = $props();
+	let {
+		uuid,
+		sender,
+		contentJson,
+		text,
+		createdAt,
+		attachmentsJson = '[]',
+		filesJson = '[]',
+		highlighted = false,
+		searchQuery = ''
+	}: Props = $props();
 
 	const formattedTime = $derived(
 		createdAt
@@ -43,6 +67,24 @@
 		}
 	})());
 
+	const attachments: Attachment[] = $derived((() => {
+		try {
+			const parsed = JSON.parse(attachmentsJson);
+			return Array.isArray(parsed) ? parsed : [];
+		} catch {
+			return [];
+		}
+	})());
+
+	const files: FileRef[] = $derived((() => {
+		try {
+			const parsed = JSON.parse(filesJson);
+			return Array.isArray(parsed) ? parsed : [];
+		} catch {
+			return [];
+		}
+	})());
+
 	function renderText(t: string): string {
 		const html = renderMarkdown(t);
 		if (searchQuery) {
@@ -57,6 +99,12 @@
 			return block.content.map((c) => c.text || '').join('\n');
 		}
 		return '';
+	}
+
+	function formatFileSize(bytes: number): string {
+		if (bytes < 1024) return `${bytes} B`;
+		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	}
 
 	let bubbleEl: HTMLDivElement;
@@ -91,11 +139,57 @@
 			? 'bg-bg-message-human text-text-primary'
 			: 'text-text-primary'}"
 	>
+		{#if attachments.length > 0}
+			<div class="mb-2 flex flex-wrap gap-2">
+				{#each attachments as att}
+					<details class="w-full rounded-lg border border-border">
+						<summary class="flex cursor-pointer items-center gap-2 px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
+							<span>📎 {att.file_name}</span>
+							{#if att.file_size}
+								<span class="opacity-60">({formatFileSize(att.file_size)})</span>
+							{/if}
+						</summary>
+						{#if att.extracted_content}
+							<pre class="max-h-[300px] overflow-auto border-t border-border p-3"><code class="text-xs text-text-secondary">{att.extracted_content}</code></pre>
+						{/if}
+					</details>
+				{/each}
+			</div>
+		{/if}
+
+		{#if files.length > 0 && attachments.length === 0}
+			<div class="mb-2 flex flex-wrap gap-1">
+				{#each files as file}
+					<span class="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-text-secondary">
+						📄 {file.file_name}
+					</span>
+				{/each}
+			</div>
+		{/if}
+
 		{#each content as block}
 			{#if block.type === 'text' && block.text}
 				<div class="markdown-body text-sm leading-relaxed">
 					{@html renderText(block.text)}
 				</div>
+			{:else if block.type === 'thinking' && block.thinking}
+				<details class="my-2 rounded-lg border border-border">
+					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
+						💭 Thinking
+					</summary>
+					<div class="markdown-body max-h-[400px] overflow-auto border-t border-border p-3 text-xs leading-relaxed text-text-secondary">
+						{@html renderMarkdown(block.thinking)}
+					</div>
+				</details>
+			{:else if block.type === 'thinking' && block.text}
+				<details class="my-2 rounded-lg border border-border">
+					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
+						💭 Thinking
+					</summary>
+					<div class="markdown-body max-h-[400px] overflow-auto border-t border-border p-3 text-xs leading-relaxed text-text-secondary">
+						{@html renderMarkdown(block.text)}
+					</div>
+				</details>
 			{:else if block.type === 'tool_use'}
 				<details class="my-2 rounded-lg border border-border">
 					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">

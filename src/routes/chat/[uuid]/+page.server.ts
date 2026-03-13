@@ -30,6 +30,8 @@ export const load: PageServerLoad = ({ params }) => {
 		created_at: string;
 		message_order: number;
 		has_tool_use: number;
+		attachments_json: string;
+		files_json: string;
 	}>;
 
 	return { conversation, messages };

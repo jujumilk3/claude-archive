@@ -49,6 +49,8 @@
 						contentJson={msg.content_json}
 						text={msg.text}
 						createdAt={msg.created_at}
+						attachmentsJson={msg.attachments_json}
+						filesJson={msg.files_json}
 						highlighted={highlightUuid === msg.uuid}
 						{searchQuery}
 					/>

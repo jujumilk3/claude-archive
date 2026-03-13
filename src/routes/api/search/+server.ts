@@ -37,7 +37,15 @@ export const GET: RequestHandler = ({ url }) => {
 			`SELECT
 				m.uuid as message_uuid,
 				m.conversation_uuid,
-				c.name as conversation_name,
+				CASE WHEN c.name != '' THEN c.name
+					ELSE COALESCE(
+						(SELECT SUBSTR(m2.text, 1, 50)
+						 FROM message m2
+						 WHERE m2.conversation_uuid = c.uuid AND m2.sender = 'human'
+						 ORDER BY m2.message_order LIMIT 1),
+						''
+					)
+				END as conversation_name,
 				snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet,
 				m.sender as message_sender,
 				m.created_at

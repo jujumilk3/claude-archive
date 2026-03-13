@@ -21,6 +21,7 @@ All phases implemented. Tagged at `0.0.20`.
 - **Phase 11: Bug Fixes** — Dark `<mark>` styling, FTS5 special char escaping, bundle size optimization, `rb` alias fix, search infinite scroll
 - **Phase 12: Final Should-Haves** — Ingest progress counter, file-level JSON error handling
 - **Phase 13: Spec Compliance Fixes** — Custom error page (`+error.svelte`), project detail description in expanded panel, `users.json` spec inconsistency fix
+- **Phase 14: Content Completeness** — Attachments/files rendering in messages, thinking block collapsible display, search result name fallback for unnamed conversations
 
 ## Notes
 
