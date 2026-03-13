@@ -323,8 +323,9 @@
 						onclick={() => { saveSearchTerm(searchQuery); goto(`/chat/${result.conversation_uuid}?highlight=${result.message_uuid}&q=${encodeURIComponent(searchQuery)}`); onNavigate?.(); }}
 						class="mb-1 w-full rounded-md px-3 py-2 text-left {selectedIndex === i ? 'bg-bg-primary ring-1 ring-accent' : 'hover:bg-bg-primary'}"
 					>
-						<div class="truncate text-sm text-text-primary">
-							{result.conversation_name || '(제목 없음)'}
+						<div class="flex items-center gap-1.5 text-sm">
+							<span class="truncate text-text-primary">{result.conversation_name || '(제목 없음)'}</span>
+							<span class="shrink-0 text-xs text-text-secondary">· {result.message_sender === 'human' ? '나' : 'Claude'}</span>
 						</div>
 						<div class="mt-0.5 line-clamp-2 text-xs text-text-secondary">
 							{@html result.snippet}

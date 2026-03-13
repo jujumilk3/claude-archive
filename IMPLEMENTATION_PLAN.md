@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.22`.
+All phases implemented. Tagged at `0.0.23`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -23,6 +23,7 @@ All phases implemented. Tagged at `0.0.22`.
 - **Phase 13: Spec Compliance Fixes** — Custom error page (`+error.svelte`), project detail description in expanded panel, `users.json` spec inconsistency fix
 - **Phase 14: Content Completeness** — Attachments/files rendering in messages, thinking block collapsible display, search result name fallback for unnamed conversations
 - **Phase 15: Code Block Language Detection** — Auto-detected language label for unlabeled code blocks (uses highlight.js `highlightAuto` result instead of generic 'code')
+- **Phase 16: Search Result Sender Label** — Display message sender (나/Claude) in search result cards per search spec
 
 ## Notes
 
