@@ -1,64 +1,68 @@
-import { json } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/db';
 import { escapeFts5Query } from '$lib/search';
 
-
 export const GET: RequestHandler = ({ url }) => {
 	const q = url.searchParams.get('q') || '';
-	const offset = parseInt(url.searchParams.get('offset') || '0', 10);
-	const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+	const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10) || 0);
+	const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10) || 20));
 
 	if (q.length < 2) {
 		return json({ results: [], total: 0, hasMore: false });
 	}
 
-	const db = getDb();
 	const escaped = escapeFts5Query(q);
 
 	if (!escaped) {
 		return json({ results: [], total: 0, hasMore: false });
 	}
 
-	const ftsQuery = `"${escaped}"`;
+	try {
+		const db = getDb();
+		const ftsQuery = `"${escaped}"`;
 
-	const countResult = db
-		.prepare(
-			`SELECT COUNT(*) as count
-			 FROM message_fts
-			 WHERE message_fts MATCH ?`
-		)
-		.get(ftsQuery) as { count: number };
+		const countResult = db
+			.prepare(
+				`SELECT COUNT(*) as count
+				 FROM message_fts
+				 WHERE message_fts MATCH ?`
+			)
+			.get(ftsQuery) as { count: number };
 
-	const results = db
-		.prepare(
-			`SELECT
-				m.uuid as message_uuid,
-				m.conversation_uuid,
-				CASE WHEN c.name != '' THEN c.name
-					ELSE COALESCE(
-						(SELECT SUBSTR(m2.text, 1, 50)
-						 FROM message m2
-						 WHERE m2.conversation_uuid = c.uuid AND m2.sender = 'human'
-						 ORDER BY m2.message_order LIMIT 1),
-						''
-					)
-				END as conversation_name,
-				snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet,
-				m.sender as message_sender,
-				m.created_at
-			 FROM message_fts
-			 JOIN message m ON m.rowid = message_fts.rowid
-			 JOIN conversation c ON c.uuid = m.conversation_uuid
-			 WHERE message_fts MATCH ?
-			 ORDER BY rank
-			 LIMIT ? OFFSET ?`
-		)
-		.all(ftsQuery, limit, offset);
+		const results = db
+			.prepare(
+				`SELECT
+					m.uuid as message_uuid,
+					m.conversation_uuid,
+					CASE WHEN c.name != '' THEN c.name
+						ELSE COALESCE(
+							(SELECT SUBSTR(m2.text, 1, 50)
+							 FROM message m2
+							 WHERE m2.conversation_uuid = c.uuid AND m2.sender = 'human'
+							 ORDER BY m2.message_order LIMIT 1),
+							''
+						)
+					END as conversation_name,
+					snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet,
+					m.sender as message_sender,
+					m.created_at
+				 FROM message_fts
+				 JOIN message m ON m.rowid = message_fts.rowid
+				 JOIN conversation c ON c.uuid = m.conversation_uuid
+				 WHERE message_fts MATCH ?
+				 ORDER BY rank
+				 LIMIT ? OFFSET ?`
+			)
+			.all(ftsQuery, limit, offset);
 
-	return json({
-		results,
-		total: countResult.count,
-		hasMore: offset + limit < countResult.count
-	});
+		return json({
+			results,
+			total: countResult.count,
+			hasMore: offset + limit < countResult.count
+		});
+	} catch (e) {
+		console.error('Search query failed:', e);
+		error(500, 'Internal server error');
+	}
 };

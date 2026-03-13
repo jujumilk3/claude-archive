@@ -163,4 +163,53 @@ describe('data access layer', () => {
 		const { getProjectDocs } = await import('./queries');
 		expect(getProjectDocs('proj-2')).toEqual([]);
 	});
+
+	it('getMessagesByConversation returns all expected fields', async () => {
+		const { getMessagesByConversation } = await import('./queries');
+		const messages = getMessagesByConversation('conv-a');
+		const msg = messages[0];
+
+		expect(msg).toHaveProperty('uuid');
+		expect(msg).toHaveProperty('text');
+		expect(msg).toHaveProperty('content_json');
+		expect(msg).toHaveProperty('sender');
+		expect(msg).toHaveProperty('created_at');
+		expect(msg).toHaveProperty('message_order');
+		expect(msg).toHaveProperty('has_tool_use');
+		expect(msg).toHaveProperty('attachments_json');
+		expect(msg).toHaveProperty('files_json');
+	});
+
+	it('getConversationList includes first_message_preview for named conversations', async () => {
+		const { getConversationList } = await import('./queries');
+		const list = getConversationList(0, 10);
+
+		const named = list.find((c) => c.uuid === 'conv-a');
+		expect(named).toBeDefined();
+		expect(named!.name).toBe('Alpha Chat');
+		expect(named!.first_message_preview).toBe('Hello from user');
+	});
+
+	it('getProjectByUuid returns all expected fields', async () => {
+		const { getProjectByUuid } = await import('./queries');
+		const proj = getProjectByUuid('proj-1');
+
+		expect(proj).toBeDefined();
+		expect(proj).toHaveProperty('uuid');
+		expect(proj).toHaveProperty('name');
+		expect(proj).toHaveProperty('description');
+		expect(proj).toHaveProperty('created_at');
+		expect(proj).toHaveProperty('updated_at');
+	});
+
+	it('getProjectDocs returns all expected fields', async () => {
+		const { getProjectDocs } = await import('./queries');
+		const docs = getProjectDocs('proj-1');
+		const doc = docs[0];
+
+		expect(doc).toHaveProperty('uuid');
+		expect(doc).toHaveProperty('filename');
+		expect(doc).toHaveProperty('content');
+		expect(doc).toHaveProperty('created_at');
+	});
 });
