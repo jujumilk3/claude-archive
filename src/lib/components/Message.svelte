@@ -157,7 +157,7 @@
 			</div>
 		{/if}
 
-		{#if files.length > 0 && attachments.length === 0}
+		{#if files.length > 0}
 			<div class="mb-2 flex flex-wrap gap-1">
 				{#each files as file}
 					<span class="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-xs text-text-secondary">

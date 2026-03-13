@@ -15,14 +15,17 @@
 		searchQuery = q || '';
 
 		if (highlight) {
-			highlightUuid = highlight;
+			highlightUuid = '';
 			tick().then(() => {
-				setTimeout(() => {
-					const el = document.getElementById(`msg-${highlight}`);
-					if (el) {
-						el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-					}
-				}, 100);
+				highlightUuid = highlight;
+				tick().then(() => {
+					setTimeout(() => {
+						const el = document.getElementById(`msg-${highlight}`);
+						if (el) {
+							el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+						}
+					}, 100);
+				});
 			});
 		} else {
 			highlightUuid = '';

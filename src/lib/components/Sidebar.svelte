@@ -159,11 +159,17 @@
 		}
 		debounceTimer = setTimeout(async () => {
 			isSearching = true;
-			const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&offset=0&limit=20`);
-			const data = await res.json();
-			searchResults = data.results;
-			searchTotal = data.total;
-			searchHasMore = data.hasMore;
+			try {
+				const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&offset=0&limit=20`);
+				const data = await res.json();
+				searchResults = data.results;
+				searchTotal = data.total;
+				searchHasMore = data.hasMore;
+			} catch {
+				searchResults = [];
+				searchTotal = 0;
+				searchHasMore = false;
+			}
 		}, 300);
 	}
 

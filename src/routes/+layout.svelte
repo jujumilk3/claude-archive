@@ -45,13 +45,14 @@
 		}
 		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 			e.preventDefault();
+			const wasCollapsed = sidebarCollapsed;
 			if (sidebarCollapsed) {
 				sidebarCollapsed = false;
 				if (browser && !isMobile) localStorage.setItem('sidebar-collapsed', 'false');
 			}
-			requestAnimationFrame(() => {
+			setTimeout(() => {
 				sidebarRef?.focusSearch();
-			});
+			}, wasCollapsed ? 220 : 0);
 		}
 		if (e.key === 'Escape') {
 			if (isMobile && !sidebarCollapsed) {
