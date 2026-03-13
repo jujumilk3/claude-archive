@@ -88,6 +88,9 @@
 
 						{#if expandedUuid === project.uuid}
 							<div class="border-t border-border px-4 py-3">
+								{#if project.description}
+									<p class="mb-3 text-sm text-text-secondary">{project.description}</p>
+								{/if}
 								{#if loadingDocs}
 									<p class="text-sm text-text-secondary">로딩 중...</p>
 								{:else if docs.length === 0}

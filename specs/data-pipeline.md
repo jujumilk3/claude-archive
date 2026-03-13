@@ -10,7 +10,7 @@ Claude export ZIP 파일에서 JSON을 추출하고 SQLite 데이터베이스로
 
 ### Must Have
 - [ ] `temp-data/` 디렉토리의 ZIP 파일을 자동 감지하고 압축 해제
-- [ ] `conversations.json`, `projects.json`, `users.json`을 파싱하여 SQLite에 삽입
+- [ ] `conversations.json`, `projects.json`을 파싱하여 SQLite에 삽입 (`users.json`은 단일 사용자 아카이브이므로 불필요 — `database-schema.md` 참조)
 - [ ] 이미 처리된 데이터는 건너뛰기 (UUID 기반 중복 방지)
 - [ ] 새로운 ZIP 파일 추가 시 기존 DB에 증분 업데이트
 - [ ] 대화 메시지의 content 배열 내 text/tool_use/tool_result를 올바르게 파싱
