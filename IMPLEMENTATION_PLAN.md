@@ -77,6 +77,7 @@ Sorted by implementation priority (dependency order).
 ## Phase 11: Bug Fixes & Polish
 
 - [x] **11.1 Dark-theme `<mark>` styling for search snippets** — FTS5 `snippet()` returns `<mark>` tags in sidebar search results. Browser default yellow background clashed with dark theme. Added global `mark` CSS in `app.css` matching the existing `search-highlight` color (rgba(218, 119, 86, 0.4)).
+- [x] **11.2 FTS5 special character escaping** — `escapeFts5Query` only stripped `'"*()`. Added `[]{}`, `-`, `:`, `^`, `~` to prevent query syntax errors when users search for terms containing these characters.
 
 ### Spec Divergences (Intentional)
 

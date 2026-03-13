@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { getDb } from '$lib/db';
 
 function escapeFts5Query(query: string): string {
-	return query.replace(/['"*()]/g, ' ').trim();
+	return query.replace(/['"*()[\]{}\-:^~]/g, ' ').trim();
 }
 
 export const GET: RequestHandler = ({ url }) => {
