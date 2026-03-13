@@ -53,6 +53,21 @@ Sorted by implementation priority (dependency order).
 - [x] **7.6 Scroll performance** — Optimize for long conversations (content-visibility: auto)
 - [x] **7.7 Project search/filter** — Filter projects by name
 
+## Phase 8: Spec Compliance — Must-Have Gaps
+
+- [x] **8.1 Full markdown rendering** — Replace regex-only `renderMarkdownInline` with `marked` library. Supports headings, lists (ordered/unordered), tables, blockquotes, horizontal rules, bold/italic, links, inline code. (`src/lib/markdown.ts`)
+- [x] **8.2 Syntax highlighting** — `highlight.js` with `github-dark` theme. Auto-detects language when not specified. Custom marked renderer for code blocks.
+- [x] **8.3 Line numbers in code blocks** — Generated in custom code renderer with `.line-number` spans. User-select disabled for copy friendliness.
+- [x] **8.4 Timestamp placement fix** — Moved timestamp outside bubble div with `self-end` alignment so it appears beside the message on hover, not breaking layout.
+- [ ] **8.5 Search term highlighting in chat view** — When navigating from search results, highlight matching terms within message text (not just the message-level fade animation).
+- [ ] **8.6 Keyboard navigation for search results** — Arrow key navigation through search results, Enter to select.
+
+## Phase 9: Spec Compliance — Should-Have Gaps
+
+- [ ] **9.1 Project doc markdown rendering** — Render project doc content as markdown instead of raw `<pre><code>`.
+- [ ] **9.2 Search history** — Remember recent search terms.
+- [ ] **9.3 Global Escape key** — Escape dismisses sidebar overlay on mobile (currently only works in search input).
+
 ---
 
 ## Not In Scope (Parking Lot)

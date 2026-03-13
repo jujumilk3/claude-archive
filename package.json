@@ -30,6 +30,8 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.0"
+    "better-sqlite3": "^11.8.0",
+    "highlight.js": "^11.11.1",
+    "marked": "^17.0.4"
   }
 }

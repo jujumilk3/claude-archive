@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { renderMarkdown } from '$lib/markdown';
+
 	interface ContentBlock {
 		type: 'text' | 'tool_use' | 'tool_result';
 		text?: string;
@@ -48,50 +50,17 @@
 		return '';
 	}
 
-	function copyToClipboard(text: string, btn: HTMLButtonElement) {
-		navigator.clipboard.writeText(text);
-		const original = btn.textContent;
-		btn.textContent = 'Copied!';
-		setTimeout(() => {
-			btn.textContent = original;
-		}, 1500);
-	}
-
-	function extractCodeBlocks(text: string): Array<{ type: 'text' | 'code'; content: string; lang?: string }> {
-		const parts: Array<{ type: 'text' | 'code'; content: string; lang?: string }> = [];
-		const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-		let lastIndex = 0;
-		let match;
-
-		while ((match = codeBlockRegex.exec(text)) !== null) {
-			if (match.index > lastIndex) {
-				parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
-			}
-			parts.push({ type: 'code', content: match[2], lang: match[1] || undefined });
-			lastIndex = match.index + match[0].length;
+	function handleClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (target.classList.contains('copy-btn')) {
+			const code = target.dataset.code || '';
+			navigator.clipboard.writeText(code);
+			const original = target.textContent;
+			target.textContent = 'Copied!';
+			setTimeout(() => {
+				target.textContent = original;
+			}, 1500);
 		}
-
-		if (lastIndex < text.length) {
-			parts.push({ type: 'text', content: text.slice(lastIndex) });
-		}
-
-		return parts.length > 0 ? parts : [{ type: 'text', content: text }];
-	}
-
-	function renderMarkdownInline(text: string): string {
-		let html = text
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;');
-
-		html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-		html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-		html = html.replace(/`([^`]+)`/g, '<code class="rounded bg-code-bg px-1 py-0.5 text-sm">$1</code>');
-		html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline" target="_blank" rel="noopener">$1</a>');
-
-		html = html.replace(/\n/g, '<br>');
-
-		return html;
 	}
 </script>
 
@@ -99,34 +68,18 @@
 	id="msg-{uuid}"
 	class="msg-wrapper group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
 >
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
-		class="max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
+		class="msg-bubble max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
 			? 'bg-bg-message-human text-text-primary'
 			: 'text-text-primary'}"
+		onclick={handleClick}
 	>
 		{#each content as block}
 			{#if block.type === 'text' && block.text}
-				{@const parts = extractCodeBlocks(block.text)}
-				{#each parts as part}
-					{#if part.type === 'code'}
-						<div class="group relative my-3 overflow-hidden rounded-lg bg-code-bg">
-							<div class="flex items-center justify-between border-b border-border px-4 py-1.5">
-								<span class="text-xs text-text-secondary">{part.lang || 'code'}</span>
-								<button
-									onclick={(e) => copyToClipboard(part.content, e.currentTarget as HTMLButtonElement)}
-									class="text-xs text-text-secondary hover:text-text-primary"
-								>
-									Copy
-								</button>
-							</div>
-							<pre class="max-h-[500px] overflow-auto p-4"><code class="text-sm text-text-primary">{part.content}</code></pre>
-						</div>
-					{:else}
-						<div class="prose-invert text-sm leading-relaxed">
-							{@html renderMarkdownInline(part.content)}
-						</div>
-					{/if}
-				{/each}
+				<div class="markdown-body text-sm leading-relaxed">
+					{@html renderMarkdown(block.text)}
+				</div>
 			{:else if block.type === 'tool_use'}
 				<details class="my-2 rounded-lg border border-border">
 					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
@@ -145,7 +98,7 @@
 		{/each}
 	</div>
 	{#if formattedTime}
-		<div class="mt-1 hidden text-xs text-text-secondary group-hover/msg:block {sender === 'human' ? 'text-right' : 'text-left'}">
+		<div class="self-end pb-1 pl-2 pr-2 hidden text-xs text-text-secondary group-hover/msg:block">
 			{formattedTime}
 		</div>
 	{/if}
@@ -162,5 +115,47 @@
 	.msg-wrapper {
 		content-visibility: auto;
 		contain-intrinsic-size: auto 120px;
+	}
+
+	/* Markdown body styles */
+	.markdown-body :global(h1) { font-size: 1.5em; font-weight: 700; margin: 0.67em 0; }
+	.markdown-body :global(h2) { font-size: 1.25em; font-weight: 700; margin: 0.6em 0; }
+	.markdown-body :global(h3) { font-size: 1.1em; font-weight: 600; margin: 0.5em 0; }
+	.markdown-body :global(h4),
+	.markdown-body :global(h5),
+	.markdown-body :global(h6) { font-size: 1em; font-weight: 600; margin: 0.4em 0; }
+	.markdown-body :global(ul) { list-style-type: disc; padding-left: 1.5em; margin: 0.4em 0; }
+	.markdown-body :global(ol) { list-style-type: decimal; padding-left: 1.5em; margin: 0.4em 0; }
+	.markdown-body :global(li) { margin: 0.15em 0; }
+	.markdown-body :global(li > ul),
+	.markdown-body :global(li > ol) { margin: 0.1em 0; }
+	.markdown-body :global(blockquote) {
+		border-left: 3px solid var(--border);
+		padding-left: 1em;
+		margin: 0.5em 0;
+		color: var(--text-secondary);
+	}
+	.markdown-body :global(p) { margin: 0.4em 0; }
+	.markdown-body :global(p:first-child) { margin-top: 0; }
+	.markdown-body :global(p:last-child) { margin-bottom: 0; }
+	.markdown-body :global(hr) { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
+	.markdown-body :global(strong) { font-weight: 700; }
+
+	/* Code block line numbers */
+	.msg-bubble :global(.code-line) {
+		display: block;
+	}
+	.msg-bubble :global(.line-number) {
+		display: inline-block;
+		width: 3em;
+		text-align: right;
+		padding-right: 1em;
+		color: var(--text-secondary);
+		opacity: 0.5;
+		user-select: none;
+		font-size: 0.75rem;
+	}
+	.msg-bubble :global(.line-content) {
+		display: inline;
 	}
 </style>
