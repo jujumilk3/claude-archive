@@ -51,7 +51,7 @@ Sorted by implementation priority (dependency order).
 - [x] **7.4 Skeleton loading UI** — Loading states for conversation list and chat view
 - [x] **7.5 Search enhancements** — Result count display, ESC to dismiss search
 - [ ] **7.6 Scroll performance** — Optimize for long conversations (virtualized list if needed)
-- [ ] **7.7 Project search/filter** — Filter projects by name
+- [x] **7.7 Project search/filter** — Filter projects by name
 
 ---
 

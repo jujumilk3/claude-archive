@@ -6,6 +6,16 @@
 	let expandedUuid = $state<string | null>(null);
 	let docs = $state<Array<{ uuid: string; filename: string; content: string; created_at: string }>>([]);
 	let loadingDocs = $state(false);
+	let filterQuery = $state('');
+
+	const filteredProjects = $derived(
+		filterQuery.length < 1
+			? data.projects
+			: data.projects.filter((p) => {
+					const q = filterQuery.toLowerCase();
+					return p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
+				})
+	);
 
 	async function toggleProject(uuid: string) {
 		if (expandedUuid === uuid) {
@@ -28,16 +38,35 @@
 </script>
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-bg-primary">
-	<header class="border-b border-border px-6 py-3">
-		<h1 class="text-lg font-medium text-text-primary">프로젝트</h1>
+	<header class="border-b border-border px-6 py-3 pl-12 md:pl-6">
+		<div class="flex items-center gap-4">
+			<h1 class="text-lg font-medium text-text-primary">프로젝트</h1>
+			<div class="relative flex-1 max-w-xs">
+				<input
+					type="text"
+					placeholder="프로젝트 검색..."
+					bind:value={filterQuery}
+					class="w-full rounded-md border border-border bg-bg-sidebar px-3 py-1 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
+				/>
+				{#if filterQuery}
+					<button
+						onclick={() => (filterQuery = '')}
+						class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+					>✕</button>
+				{/if}
+			</div>
+			<span class="text-xs text-text-secondary">{filteredProjects.length}개</span>
+		</div>
 	</header>
 
 	<div class="flex-1 overflow-y-auto">
 		<div class="mx-auto max-w-3xl px-4 py-6">
 			{#if data.projects.length === 0}
 				<p class="text-center text-text-secondary">프로젝트가 없습니다</p>
+			{:else if filteredProjects.length === 0}
+				<p class="text-center text-text-secondary">일치하는 프로젝트가 없습니다</p>
 			{:else}
-				{#each data.projects as project}
+				{#each filteredProjects as project}
 					<div class="mb-3 rounded-lg border border-border">
 						<button
 							onclick={() => toggleProject(project.uuid)}
