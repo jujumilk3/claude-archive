@@ -258,17 +258,25 @@ function main() {
 		let projCount = 0;
 
 		if (fs.existsSync(conversationsFile)) {
-			const result = ingestConversations(db, conversationsFile);
-			convCount = result.conversations;
-			msgCount = result.messages;
-			console.log(`  Conversations: ${convCount}, Messages: ${msgCount}`);
+			try {
+				const result = ingestConversations(db, conversationsFile);
+				convCount = result.conversations;
+				msgCount = result.messages;
+				console.log(`  Conversations: ${convCount}, Messages: ${msgCount}`);
+			} catch (err) {
+				console.error(`  Failed to parse ${conversationsFile}: ${(err as Error).message}`);
+			}
 		} else {
 			console.log('  No conversations.json found');
 		}
 
 		if (fs.existsSync(projectsFile)) {
-			projCount = ingestProjects(db, projectsFile);
-			console.log(`  Projects: ${projCount}`);
+			try {
+				projCount = ingestProjects(db, projectsFile);
+				console.log(`  Projects: ${projCount}`);
+			} catch (err) {
+				console.error(`  Failed to parse ${projectsFile}: ${(err as Error).message}`);
+			}
 		} else {
 			console.log('  No projects.json found');
 		}

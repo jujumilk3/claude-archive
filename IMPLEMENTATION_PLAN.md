@@ -85,6 +85,7 @@ Sorted by implementation priority (dependency order).
 ## Phase 12: Remaining Should-Have Items
 
 - [x] **12.1 Ingest progress counter** — Added per-conversation progress display (`Processing conversations: N/total`) to `scripts/ingest.ts`. Updates every 100 conversations and at completion. Uses `\r` for in-place terminal updates.
+- [x] **12.2 File-level JSON parse error handling** — Wrapped `ingestConversations` and `ingestProjects` calls in try/catch in `main()`. A malformed `conversations.json` or `projects.json` now logs an error and continues processing remaining directories instead of aborting the entire ingest. Satisfies spec edge case: "깨진 JSON: 파싱 실패 시 해당 파일 건너뛰고 에러 로그".
 
 ### Remaining Should-Have Gaps (Low Priority)
 
