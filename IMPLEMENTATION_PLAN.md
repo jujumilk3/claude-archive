@@ -43,7 +43,7 @@ Sorted by implementation priority (dependency order).
 - [x] **6.1 Projects page** — `/projects` with server-side loading, project list with doc count. Click to expand inline.
 - [x] **6.2 Project detail** — Inline expansion showing docs with `<details>` for each file. API: `GET /api/projects/:uuid`.
 
-## Phase 7: Polish & Should-Haves
+## Phase 7: Polish & Should-Haves ✅
 
 - [x] **7.1 Keyboard shortcuts** — ⌘K (search focus, opens sidebar if collapsed), ⌘B (sidebar toggle), Escape (clear search)
 - [x] **7.2 Mobile responsive** — Sidebar as overlay on narrow screens
