@@ -130,4 +130,19 @@ describe('renderMarkdown', () => {
 		const result = renderMarkdown('[click](https://example.com)');
 		expect(result).toContain('href="https://example.com"');
 	});
+
+	it('escapes HTML in code block language labels when auto-detect falls back to lang', () => {
+		const result = renderMarkdown('```<img/onerror=alert(1)>\nx\n```');
+		expect(result).not.toMatch(/<img[^>]*onerror/);
+		const langSpanMatch = result.match(/<span class="text-xs text-text-secondary">([^<]*)<\/span>/);
+		if (langSpanMatch) {
+			expect(langSpanMatch[1]).not.toContain('<');
+		}
+	});
+
+	it('escapes double quotes in link hrefs to prevent attribute injection', () => {
+		const result = renderMarkdown('[click](https://example.com/foo"onmouseover="alert(1))');
+		expect(result).not.toContain('"onmouseover="');
+		expect(result).toContain('&quot;');
+	});
 });

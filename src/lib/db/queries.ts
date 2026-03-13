@@ -158,10 +158,13 @@ LIMIT ? OFFSET ?`;
 
 export function searchMessages(ftsQuery: string, offset = 0, limit = 20): { results: SearchResult[]; total: number } {
 	const db = getDb();
-	const countResult = db
-		.prepare('SELECT COUNT(*) as count FROM message_fts WHERE message_fts MATCH ?')
-		.get(ftsQuery) as { count: number } | undefined;
-	const total = countResult?.count ?? 0;
-	const results = db.prepare(SEARCH_SQL).all(ftsQuery, limit, offset) as SearchResult[];
-	return { results, total };
+	const search = db.transaction(() => {
+		const countResult = db
+			.prepare('SELECT COUNT(*) as count FROM message_fts WHERE message_fts MATCH ?')
+			.get(ftsQuery) as { count: number } | undefined;
+		const total = countResult?.count ?? 0;
+		const results = db.prepare(SEARCH_SQL).all(ftsQuery, limit, offset) as SearchResult[];
+		return { results, total };
+	});
+	return search();
 }
