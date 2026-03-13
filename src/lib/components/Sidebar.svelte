@@ -43,6 +43,8 @@
 	let loading = $state(false);
 	let initialized = false;
 	let searchTotal = $state(0);
+	let searchHasMore = $state(false);
+	let searchLoading = $state(false);
 	let selectedIndex = $state(-1);
 	let searchFocused = $state(false);
 	let searchHistory: string[] = $state(loadSearchHistory());
@@ -123,10 +125,27 @@
 	}
 
 	function handleScroll() {
-		if (!listEl || isSearching || !hasMore || loading) return;
+		if (!listEl) return;
 		const { scrollTop, scrollHeight, clientHeight } = listEl;
 		if (scrollHeight - scrollTop - clientHeight < 200) {
-			loadConversations(conversations.length);
+			if (isSearching) {
+				loadMoreSearchResults();
+			} else if (hasMore && !loading) {
+				loadConversations(conversations.length);
+			}
+		}
+	}
+
+	async function loadMoreSearchResults() {
+		if (!searchHasMore || searchLoading || !searchQuery) return;
+		searchLoading = true;
+		try {
+			const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&offset=${searchResults.length}&limit=20`);
+			const data = await res.json();
+			searchResults = [...searchResults, ...data.results];
+			searchHasMore = data.hasMore;
+		} finally {
+			searchLoading = false;
 		}
 	}
 
@@ -140,10 +159,11 @@
 		}
 		debounceTimer = setTimeout(async () => {
 			isSearching = true;
-			const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&limit=20`);
+			const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&offset=0&limit=20`);
 			const data = await res.json();
 			searchResults = data.results;
 			searchTotal = data.total;
+			searchHasMore = data.hasMore;
 		}, 300);
 	}
 
@@ -151,6 +171,7 @@
 		searchQuery = '';
 		isSearching = false;
 		searchResults = [];
+		searchHasMore = false;
 		selectedIndex = -1;
 	}
 
@@ -310,6 +331,9 @@
 						</div>
 					</button>
 				{/each}
+				{#if searchLoading}
+					<div class="py-4 text-center text-sm text-text-secondary">로딩 중...</div>
+				{/if}
 			{/if}
 		{:else}
 			{#each dateGroups as group}
