@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { escapeFts5Query } from '$lib/search';
+import { escapeFts5Query, sanitizeSnippet } from '$lib/search';
 import { searchMessages } from '$lib/db/queries';
 
 export const GET: RequestHandler = ({ url }) => {
@@ -23,7 +23,7 @@ export const GET: RequestHandler = ({ url }) => {
 		const { results, total } = searchMessages(ftsQuery, offset, limit);
 
 		return json({
-			results,
+			results: results.map((r) => ({ ...r, snippet: sanitizeSnippet(r.snippet) })),
 			total,
 			hasMore: offset + limit < total
 		});

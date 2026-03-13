@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { escapeFts5Query } from './search';
+import { escapeFts5Query, sanitizeSnippet } from './search';
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -51,6 +51,42 @@ describe('escapeFts5Query', () => {
 	it('collapses special chars to spaces between words', () => {
 		const result = escapeFts5Query('hello-world');
 		expect(result).toBe('hello world');
+	});
+});
+
+describe('sanitizeSnippet', () => {
+	it('preserves mark tags while escaping HTML', () => {
+		const input = '<mark>hello</mark> world';
+		expect(sanitizeSnippet(input)).toBe('<mark>hello</mark> world');
+	});
+
+	it('escapes script tags in snippet text', () => {
+		const input = '<script>alert(1)</script> <mark>test</mark>';
+		expect(sanitizeSnippet(input)).toBe('&lt;script&gt;alert(1)&lt;/script&gt; <mark>test</mark>');
+	});
+
+	it('escapes img onerror XSS', () => {
+		const input = '<img src=x onerror=alert(1)> <mark>found</mark>';
+		expect(sanitizeSnippet(input)).toBe('&lt;img src=x onerror=alert(1)&gt; <mark>found</mark>');
+	});
+
+	it('escapes ampersands and quotes', () => {
+		const input = 'Tom &amp; Jerry "quoted" <mark>match</mark>';
+		expect(sanitizeSnippet(input)).toBe('Tom &amp;amp; Jerry &quot;quoted&quot; <mark>match</mark>');
+	});
+
+	it('handles multiple mark tags', () => {
+		const input = '<mark>first</mark> middle <mark>second</mark>';
+		expect(sanitizeSnippet(input)).toBe('<mark>first</mark> middle <mark>second</mark>');
+	});
+
+	it('handles snippet with only text (no marks)', () => {
+		const input = '...plain text snippet...';
+		expect(sanitizeSnippet(input)).toBe('...plain text snippet...');
+	});
+
+	it('handles empty string', () => {
+		expect(sanitizeSnippet('')).toBe('');
 	});
 });
 
@@ -137,6 +173,27 @@ describe('FTS5 search integration', () => {
 		expect(results.length).toBe(1);
 		expect(results[0].snippet).toContain('<mark>');
 		expect(results[0].snippet).toContain('</mark>');
+	});
+
+	it('proves raw FTS5 snippets pass through HTML and sanitizeSnippet fixes it', () => {
+		db.prepare(
+			`INSERT INTO message (uuid, conversation_uuid, text, content_json, sender, created_at, message_order)
+			 VALUES ('msg-xss', 'conv-1', 'Check <img src=x onerror=alert(1)> injection test', '[]', 'human', '2025-01-01T00:00:00Z', 5)`
+		).run();
+
+		const escaped = escapeFts5Query('injection');
+		const results = db
+			.prepare(
+				`SELECT snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet
+				 FROM message_fts WHERE message_fts MATCH '"${escaped}"'`
+			)
+			.all() as { snippet: string }[];
+		expect(results.length).toBe(1);
+		expect(results[0].snippet).toContain('<img');
+		const sanitized = sanitizeSnippet(results[0].snippet);
+		expect(sanitized).not.toContain('<img');
+		expect(sanitized).toContain('&lt;img');
+		expect(sanitized).toContain('<mark>injection</mark>');
 	});
 
 	it('returns results joined with conversation data', () => {
