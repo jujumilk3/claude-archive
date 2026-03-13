@@ -119,6 +119,11 @@
 				conversations = [...conversations, ...data.conversations];
 			}
 			hasMore = data.hasMore;
+		} catch {
+			if (offset === 0) {
+				conversations = [];
+			}
+			hasMore = false;
 		} finally {
 			loading = false;
 		}
@@ -144,6 +149,8 @@
 			const data = await res.json();
 			searchResults = [...searchResults, ...data.results];
 			searchHasMore = data.hasMore;
+		} catch {
+			searchHasMore = false;
 		} finally {
 			searchLoading = false;
 		}
