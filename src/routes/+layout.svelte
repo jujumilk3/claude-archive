@@ -65,8 +65,8 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div class="flex h-screen overflow-hidden">
-	{#if !sidebarCollapsed}
-		{#if isMobile}
+	{#if isMobile}
+		{#if !sidebarCollapsed}
 			<button
 				class="fixed inset-0 z-30 bg-black/50"
 				onclick={() => (sidebarCollapsed = true)}
@@ -78,12 +78,17 @@
 				totalConversations={data.totalConversations}
 				hasMoreInitial={data.hasMoreConversations} />
 			</div>
-		{:else}
+		{/if}
+	{:else}
+		<div
+			class="shrink-0 overflow-hidden transition-[width] duration-200 ease-in-out"
+			style="width: {sidebarCollapsed ? 0 : 260}px"
+		>
 			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
 				initialConversations={data.initialConversations}
 				totalConversations={data.totalConversations}
 				hasMoreInitial={data.hasMoreConversations} />
-		{/if}
+		</div>
 	{/if}
 
 	<div class="relative flex-1">

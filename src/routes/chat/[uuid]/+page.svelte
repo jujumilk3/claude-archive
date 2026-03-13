@@ -31,10 +31,12 @@
 </script>
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-bg-primary">
-	<header class="border-b border-border px-6 py-3 pl-12 md:pl-6">
-		<h1 class="text-lg font-medium text-text-primary">
-			{data.conversation.name || '(제목 없음)'}
-		</h1>
+	<header class="border-b border-border">
+		<div class="mx-auto max-w-3xl px-6 py-3 pl-12 md:pl-6">
+			<h1 class="text-lg font-medium text-text-primary">
+				{data.conversation.name || '(제목 없음)'}
+			</h1>
+		</div>
 	</header>
 
 	<div class="flex-1 overflow-y-auto">
