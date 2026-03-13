@@ -13,10 +13,23 @@
 		sender: string;
 		contentJson: string;
 		text: string;
+		createdAt?: string;
 		highlighted?: boolean;
 	}
 
-	let { uuid, sender, contentJson, text, highlighted = false }: Props = $props();
+	let { uuid, sender, contentJson, text, createdAt, highlighted = false }: Props = $props();
+
+	const formattedTime = $derived(
+		createdAt
+			? new Date(createdAt).toLocaleString('ko-KR', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit'
+				})
+			: ''
+	);
 
 	const content: ContentBlock[] = $derived((() => {
 		try {
@@ -84,7 +97,7 @@
 
 <div
 	id="msg-{uuid}"
-	class="mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
+	class="group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
 >
 	<div
 		class="max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
@@ -131,6 +144,11 @@
 			{/if}
 		{/each}
 	</div>
+	{#if formattedTime}
+		<div class="mt-1 hidden text-xs text-text-secondary group-hover/msg:block {sender === 'human' ? 'text-right' : 'text-left'}">
+			{formattedTime}
+		</div>
+	{/if}
 </div>
 
 <style>

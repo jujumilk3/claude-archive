@@ -5,6 +5,7 @@
 
 	let { children } = $props();
 	let sidebarCollapsed = $state(false);
+	let sidebarRef = $state<Sidebar>();
 
 	$effect(() => {
 		if (browser) {
@@ -25,6 +26,16 @@
 			e.preventDefault();
 			toggleSidebar();
 		}
+		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+			e.preventDefault();
+			if (sidebarCollapsed) {
+				sidebarCollapsed = false;
+				if (browser) localStorage.setItem('sidebar-collapsed', 'false');
+			}
+			requestAnimationFrame(() => {
+				sidebarRef?.focusSearch();
+			});
+		}
 	}
 </script>
 
@@ -32,7 +43,7 @@
 
 <div class="flex h-screen overflow-hidden">
 	{#if !sidebarCollapsed}
-		<Sidebar />
+		<Sidebar bind:this={sidebarRef} />
 	{/if}
 
 	<div class="relative flex-1">
@@ -42,11 +53,7 @@
 			title={sidebarCollapsed ? '사이드바 열기 (⌘B)' : '사이드바 닫기 (⌘B)'}
 		>
 			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				{#if sidebarCollapsed}
-					<path d="M3 12h18M3 6h18M3 18h18" />
-				{:else}
-					<path d="M3 12h18M3 6h18M3 18h18" />
-				{/if}
+				<path d="M3 12h18M3 6h18M3 18h18" />
 			</svg>
 		</button>
 

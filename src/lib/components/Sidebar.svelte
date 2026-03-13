@@ -32,6 +32,11 @@
 	let searchTotal = $state(0);
 	let debounceTimer: ReturnType<typeof setTimeout>;
 	let listEl: HTMLElement;
+	let searchInputEl: HTMLInputElement;
+
+	export function focusSearch() {
+		searchInputEl?.focus();
+	}
 
 	const currentUuid = $derived($page.params?.uuid || '');
 
@@ -142,9 +147,11 @@
 		<div class="relative">
 			<input
 				type="text"
-				placeholder="검색..."
+				placeholder="검색... (⌘K)"
 				bind:value={searchQuery}
+				bind:this={searchInputEl}
 				oninput={handleSearchInput}
+				onkeydown={(e) => { if (e.key === 'Escape') clearSearch(); }}
 				class="w-full rounded-md border border-border bg-bg-primary px-3 py-1.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
 			/>
 			{#if searchQuery}

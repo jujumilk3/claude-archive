@@ -99,6 +99,7 @@
 							sender={msg.sender}
 							contentJson={msg.content_json}
 							text={msg.text}
+							createdAt={msg.created_at}
 							highlighted={highlightUuid === msg.uuid}
 						/>
 					{/each}

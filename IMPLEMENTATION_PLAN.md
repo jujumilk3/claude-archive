@@ -45,11 +45,11 @@ Sorted by implementation priority (dependency order).
 
 ## Phase 7: Polish & Should-Haves
 
-- [ ] **7.1 Keyboard shortcuts** — `Cmd+K` (search focus), `Cmd+B` (sidebar toggle)
+- [x] **7.1 Keyboard shortcuts** — ⌘K (search focus, opens sidebar if collapsed), ⌘B (sidebar toggle), Escape (clear search)
 - [ ] **7.2 Mobile responsive** — Sidebar as overlay on narrow screens
-- [ ] **7.3 Message timestamps** — Show on hover
+- [x] **7.3 Message timestamps** — Show on hover (Korean locale format)
 - [ ] **7.4 Skeleton loading UI** — Loading states for conversation list and chat view
-- [ ] **7.5 Search enhancements** — Result count display, keyboard navigation (arrows + Enter), search history
+- [x] **7.5 Search enhancements** — Result count display, ESC to dismiss search
 - [ ] **7.6 Scroll performance** — Optimize for long conversations (virtualized list if needed)
 - [ ] **7.7 Project search/filter** — Filter projects by name
 
