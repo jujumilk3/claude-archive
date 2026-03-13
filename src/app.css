@@ -35,6 +35,13 @@
 	border-radius: 0.375rem;
 }
 
+mark {
+	background-color: rgba(218, 119, 86, 0.4);
+	color: inherit;
+	padding: 0 1px;
+	border-radius: 2px;
+}
+
 html, body {
 	height: 100%;
 	margin: 0;

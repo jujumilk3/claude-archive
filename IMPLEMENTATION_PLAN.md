@@ -74,6 +74,14 @@ Sorted by implementation priority (dependency order).
 - [x] **10.2 Chat page server load** — `chat/[uuid]/+page.server.ts` loads conversation metadata + messages server-side. Returns 404 error for invalid UUIDs. Chat page uses `PageProps` with server data — no client-side fetch needed.
 - [x] **10.3 Sidebar hydration** — Sidebar initializes from server-provided data, falls back to client-side fetch if no initial data. Infinite scroll still fetches additional pages client-side via `/api/conversations`.
 
+## Phase 11: Bug Fixes & Polish
+
+- [x] **11.1 Dark-theme `<mark>` styling for search snippets** — FTS5 `snippet()` returns `<mark>` tags in sidebar search results. Browser default yellow background clashed with dark theme. Added global `mark` CSS in `app.css` matching the existing `search-highlight` color (rgba(218, 119, 86, 0.4)).
+
+### Spec Divergences (Intentional)
+
+- **`highlight_ranges` in search API response** — Spec defines this field but it's unnecessary; the frontend uses FTS5 `<mark>` tags in the snippet string directly, which is simpler and sufficient.
+
 ---
 
 ## Not In Scope (Parking Lot)
