@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.33`.
+All phases implemented. Tagged at `0.0.36`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -35,6 +35,7 @@ All phases implemented. Tagged at `0.0.33`.
 - **Phase 25: Markdown XSS Hardening & Search Transaction** — Escaped `detectedLang` in code block renderer to prevent XSS via malicious fenced code block language labels. Escaped `href` attribute in link renderer to prevent attribute injection via URLs containing double quotes. Wrapped `searchMessages` count+results queries in a SQLite transaction to prevent TOCTOU inconsistency. Added 2 tests (language label XSS, href attribute injection). Test suite: 73 → 75 tests.
 - **Phase 26: API Route Handler Tests** — Added 25 tests for all 4 API endpoints (`/api/conversations`, `/api/conversations/:uuid/messages`, `/api/search`, `/api/projects/:uuid`). Tests cover parameter validation (offset/limit clamping, NaN handling), 404 responses for missing resources, 500 error handling, search query min-length guard, empty escaped query handling, FTS5 query wrapping, snippet sanitization, hasMore calculation, and response shape. Test suite: 75 → 100 tests.
 - **Phase 27: API Consistency & Conversations Transaction** — Added missing `HttpError` re-throw guard to `conversations` and `search` API endpoint catch blocks (matching the pattern already used in `messages` and `projects` endpoints — without this guard, a SvelteKit `error()` thrown from a query helper would be silently swallowed and replaced with a generic 500). Created `getConversationListWithCount()` transactional query that wraps count + list in a single SQLite transaction to prevent TOCTOU inconsistency (same pattern applied to `searchMessages` in Phase 25). Updated both the API endpoint and layout server load to use the new function. Added 4 tests (HttpError re-throw for conversations and search, transactional query correctness). Test suite: 100 → 104 tests.
+- **Phase 28: Security, Error Handling & Accessibility** — Escaped inline `codespan` text in markdown renderer to prevent XSS via malicious backtick content. Added `HttpError` re-throw guards to `+layout.server.ts` and `projects/+page.server.ts` catch blocks (completing the pattern across all server loads). Added error handling to project docs fetch with HTTP status check, catch block, and variable shadowing fix. Removed dead `totalConversations` prop from Sidebar. Added `aria-label` attributes to search inputs, clear buttons, and sidebar toggle for screen reader accessibility. Test suite: 104 → 106 tests.
 
 ## Notes
 
