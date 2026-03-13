@@ -208,4 +208,13 @@
 			{/if}
 		{/if}
 	</nav>
+
+	<div class="border-t border-border p-2">
+		<button
+			onclick={() => goto('/projects')}
+			class="w-full rounded-md px-3 py-1.5 text-left text-sm text-text-secondary hover:bg-bg-primary hover:text-text-primary"
+		>
+			📁 프로젝트
+		</button>
+	</div>
 </aside>

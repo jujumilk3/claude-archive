@@ -38,10 +38,10 @@ Sorted by implementation priority (dependency order).
 - [x] **5.2 Search UI** — Search input in sidebar, 300ms debounce, results replace conversation list, result count, clear button.
 - [x] **5.3 Message jump** — `?highlight=messageUuid` param, scrollIntoView with highlight-fade animation.
 
-## Phase 6: Projects View
+## Phase 6: Projects View ✅
 
-- [ ] **6.1 Projects page** — `src/routes/projects/+page.svelte` + `+page.server.ts`. List all projects with name, description, creation date. Click to expand/navigate to detail view showing description + docs list.
-- [ ] **6.2 Project detail** — Show each attached doc with filename and content. Markdown rendering for doc content.
+- [x] **6.1 Projects page** — `/projects` with server-side loading, project list with doc count. Click to expand inline.
+- [x] **6.2 Project detail** — Inline expansion showing docs with `<details>` for each file. API: `GET /api/projects/:uuid`.
 
 ## Phase 7: Polish & Should-Haves
 
