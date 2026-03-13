@@ -78,6 +78,7 @@ Sorted by implementation priority (dependency order).
 
 - [x] **11.1 Dark-theme `<mark>` styling for search snippets** — FTS5 `snippet()` returns `<mark>` tags in sidebar search results. Browser default yellow background clashed with dark theme. Added global `mark` CSS in `app.css` matching the existing `search-highlight` color (rgba(218, 119, 86, 0.4)).
 - [x] **11.2 FTS5 special character escaping** — `escapeFts5Query` only stripped `'"*()`. Added `[]{}`, `-`, `:`, `^`, `~` to prevent query syntax errors when users search for terms containing these characters.
+- [x] **11.3 Bundle size optimization** — Replaced `highlight.js` full import (~190 languages, 1 MB chunk) with selective imports of 19 languages (bash, css, diff, go, graphql, ini, java, javascript, json, kotlin, markdown, python, rust, shell, sql, swift, typescript, xml, yaml) + common aliases. Eliminated Vite large chunk warning.
 
 ### Spec Divergences (Intentional)
 
