@@ -136,6 +136,25 @@ export function getProjectDocs(projectUuid: string): ProjectDoc[] {
 		.all(projectUuid) as ProjectDoc[];
 }
 
+export interface ArchiveStats {
+	total_conversations: number;
+	total_messages: number;
+	total_projects: number;
+	oldest_conversation: string | null;
+	newest_conversation: string | null;
+}
+
+export function getArchiveStats(): ArchiveStats {
+	const db = getDb();
+	return db.prepare(`SELECT
+		(SELECT COUNT(*) FROM conversation) as total_conversations,
+		(SELECT COUNT(*) FROM message) as total_messages,
+		(SELECT COUNT(*) FROM project) as total_projects,
+		(SELECT MIN(created_at) FROM conversation) as oldest_conversation,
+		(SELECT MAX(created_at) FROM conversation) as newest_conversation
+	`).get() as ArchiveStats;
+}
+
 export interface SearchResult {
 	message_uuid: string;
 	conversation_uuid: string;

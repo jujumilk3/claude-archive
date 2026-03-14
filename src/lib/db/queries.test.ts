@@ -271,4 +271,26 @@ describe('data access layer', () => {
 		expect(results).toEqual([]);
 		expect(total).toBe(0);
 	});
+
+	it('getArchiveStats returns correct counts and date range', async () => {
+		const { getArchiveStats } = await import('./queries');
+		const stats = getArchiveStats();
+
+		expect(stats.total_conversations).toBe(3);
+		expect(stats.total_messages).toBe(4);
+		expect(stats.total_projects).toBe(2);
+		expect(stats.oldest_conversation).toBe('2025-01-01T00:00:00Z');
+		expect(stats.newest_conversation).toBe('2025-03-01T00:00:00Z');
+	});
+
+	it('getArchiveStats returns all expected fields', async () => {
+		const { getArchiveStats } = await import('./queries');
+		const stats = getArchiveStats();
+
+		expect(stats).toHaveProperty('total_conversations');
+		expect(stats).toHaveProperty('total_messages');
+		expect(stats).toHaveProperty('total_projects');
+		expect(stats).toHaveProperty('oldest_conversation');
+		expect(stats).toHaveProperty('newest_conversation');
+	});
 });
