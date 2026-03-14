@@ -46,6 +46,7 @@
 	let searchLoading = $state(false);
 	let selectedIndex = $state(-1);
 	let searchFocused = $state(false);
+	let searchPending = $state(false);
 	let searchHistory: string[] = $state(loadSearchHistory());
 	let debounceTimer: ReturnType<typeof setTimeout>;
 	let listEl: HTMLElement;
@@ -91,6 +92,7 @@
 	}
 
 	const currentUuid = $derived($page.params?.uuid || '');
+	const isProjectsPage = $derived($page.url?.pathname === '/projects');
 
 	$effect(() => {
 		if (!initialized) {
@@ -163,8 +165,9 @@
 			searchResults = [];
 			return;
 		}
+		isSearching = true;
+		searchPending = true;
 		debounceTimer = setTimeout(async () => {
-			isSearching = true;
 			try {
 				const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&offset=0&limit=20`);
 				const data = await res.json();
@@ -175,13 +178,17 @@
 				searchResults = [];
 				searchTotal = 0;
 				searchHasMore = false;
+			} finally {
+				searchPending = false;
 			}
 		}, 300);
 	}
 
 	function clearSearch() {
+		clearTimeout(debounceTimer);
 		searchQuery = '';
 		isSearching = false;
+		searchPending = false;
 		searchResults = [];
 		searchHasMore = false;
 		selectedIndex = -1;
@@ -328,7 +335,9 @@
 		onscroll={handleScroll}
 	>
 		{#if isSearching}
-			{#if searchResults.length === 0}
+			{#if searchPending}
+				<div class="py-4 text-center text-sm text-text-secondary">검색 중...</div>
+			{:else if searchResults.length === 0}
 				<p class="px-3 py-4 text-center text-sm text-text-secondary">검색 결과가 없습니다</p>
 			{:else}
 				<p class="px-3 py-1 text-xs text-text-secondary">{searchTotal}개 결과</p>
@@ -390,7 +399,9 @@
 	<div class="border-t border-border p-2">
 		<button
 			onclick={() => { goto('/projects'); onNavigate?.(); }}
-			class="w-full rounded-md px-3 py-1.5 text-left text-sm text-text-secondary hover:bg-bg-primary hover:text-text-primary"
+			class="w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors {isProjectsPage
+				? 'bg-bg-primary text-text-primary'
+				: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"
 		>
 			📁 프로젝트
 		</button>

@@ -7,6 +7,7 @@
 	let expandedUuid = $state<string | null>(null);
 	let docs = $state<Array<{ uuid: string; filename: string; content: string; created_at: string }>>([]);
 	let loadingDocs = $state(false);
+	let docsError = $state(false);
 	let filterQuery = $state('');
 
 	const filteredProjects = $derived(
@@ -27,12 +28,14 @@
 
 		expandedUuid = uuid;
 		loadingDocs = true;
+		docsError = false;
 		docs = [];
 
 		try {
 			const res = await fetch(`/api/projects/${uuid}`);
 			if (expandedUuid !== uuid) return;
 			if (!res.ok) {
+				docsError = true;
 				docs = [];
 				return;
 			}
@@ -40,7 +43,10 @@
 			if (expandedUuid !== uuid) return;
 			docs = result.docs ?? [];
 		} catch {
-			if (expandedUuid === uuid) docs = [];
+			if (expandedUuid === uuid) {
+				docsError = true;
+				docs = [];
+			}
 		} finally {
 			if (expandedUuid === uuid) loadingDocs = false;
 		}
@@ -105,6 +111,8 @@
 								{/if}
 								{#if loadingDocs}
 									<p class="text-sm text-text-secondary">로딩 중...</p>
+								{:else if docsError}
+									<p class="text-sm text-red-400">문서를 불러오는데 실패했습니다</p>
 								{:else if docs.length === 0}
 									<p class="text-sm text-text-secondary">문서가 없습니다</p>
 								{:else}
