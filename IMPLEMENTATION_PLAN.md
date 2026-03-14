@@ -61,6 +61,10 @@ All phases implemented. Tagged at `0.0.44`.
 
 - **Phase 44: Design Spec Compliance — Message Spacing & Light Mode Code** — Two spec compliance fixes: (1) **Message turn spacing**: Changed `mb-4` (16px) to `mb-1` (4px) on message wrapper in `Message.svelte` to match design system spec's `margin-bottom: 4px` for message turn spacing. (2) **Light mode syntax highlighting**: The app imported `highlight.js/styles/github-dark.css` unconditionally, causing dark-themed code blocks in light mode. Added `.hljs { background: transparent }` override so code blocks use the wrapper's `bg-code-bg` token (which already adapts per mode). Added `[data-mode="light"]` CSS overrides for all hljs token classes using github-light colors (keywords, strings, comments, numbers, types, etc.). Test suite: 214 tests (no new tests — pure CSS/template changes).
 
+- **Phase 45: i18n Export Error Fallback** — Fixed hardcoded English `'Export failed'` fallback string in settings page export handler. Added `settings.exportError` i18n key (ko: "내보내기 실패", en: "Export failed") and wired it into the catch block. Test suite: 214 tests (no new tests — existing i18n completeness test validates key parity).
+
+- **Phase 46: System Theme Listener & Typography Fix** — Two spec compliance fixes: (1) **System theme listener global**: The `matchMedia('prefers-color-scheme')` listener for OS theme changes was only active on the `/settings` page. Moved it to `+layout.svelte` so system theme changes are detected on all routes. Also separated theme/fontSize reactive effects from the one-time initialization effect to prevent re-reading sidebar state from localStorage on every theme change. Removed redundant listener from settings page. (2) **Message body typography**: `.markdown-body` in `Message.svelte` had `text-sm leading-relaxed` (14px/1.625) which overrode the spec-correct typography set by parent `.claude-response` (Serif 16px/24px) and `.human-message` (Sans 16px/22.4px) classes. Removed the override classes so message text renders at spec dimensions. Test suite: 214 tests (no new tests — architectural/CSS changes).
+
 ---
 
 ## Remaining Work

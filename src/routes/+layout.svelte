@@ -26,10 +26,30 @@
 			mq.addEventListener('change', handler);
 			if (isMobile) sidebarCollapsed = true;
 
-			applyTheme($resolvedTheme);
-			applyFontSize($settings.fontSize);
+			const themeMq = window.matchMedia('(prefers-color-scheme: dark)');
+			const themeHandler = () => {
+				if ($settings.theme === 'system') {
+					applyTheme(themeMq.matches ? 'dark' : 'light');
+				}
+			};
+			themeMq.addEventListener('change', themeHandler);
 
-			return () => mq.removeEventListener('change', handler);
+			return () => {
+				mq.removeEventListener('change', handler);
+				themeMq.removeEventListener('change', themeHandler);
+			};
+		}
+	});
+
+	$effect(() => {
+		if (browser) {
+			applyTheme($resolvedTheme);
+		}
+	});
+
+	$effect(() => {
+		if (browser) {
+			applyFontSize($settings.fontSize);
 		}
 	});
 

@@ -70,18 +70,6 @@
 		const mode = $resolvedTheme;
 		applyTheme(mode);
 	});
-
-	$effect(() => {
-		if (typeof window === 'undefined') return;
-		const mq = window.matchMedia('(prefers-color-scheme: dark)');
-		const handler = () => {
-			if ($settings.theme === 'system') {
-				applyTheme(mq.matches ? 'dark' : 'light');
-			}
-		};
-		mq.addEventListener('change', handler);
-		return () => mq.removeEventListener('change', handler);
-	});
 </script>
 
 <div class="flex h-full overflow-y-auto bg-bg-primary">

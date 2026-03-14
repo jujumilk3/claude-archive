@@ -163,7 +163,7 @@
 
 		{#each content as block}
 			{#if block.type === 'text' && block.text}
-				<div class="markdown-body text-sm leading-relaxed">
+				<div class="markdown-body">
 					{@html renderText(block.text)}
 				</div>
 			{:else if block.type === 'thinking' && block.thinking}
