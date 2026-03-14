@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.39`.
+All phases implemented. Tagged at `0.0.43`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -43,6 +43,7 @@ All phases implemented. Tagged at `0.0.39`.
 - **Phase 33: Navigation Loading & Accessibility** — Added animated progress bar during page navigation using SvelteKit's `$navigating` store (visible at top of content area during SSR page transitions). Fixed search history delete buttons being unreachable by keyboard (changed from `hidden`/`group-hover:block` to `opacity-0`/`focus:opacity-100`/`group-hover:opacity-100` so Tab key can reach them). Added `aria-label` to search history delete buttons for screen reader context. Added `aria-expanded` attribute to project collapsible toggle buttons to communicate open/closed state to assistive technologies. Test suite: 133 tests (no new tests — pure template/CSS changes).
 - **Phase 34: Bug Fixes & Test Coverage** — Fixed projects page race condition where rapidly clicking between projects could show wrong project's docs (stale fetch response overwrites current state). Added `expandedUuid` guards after each `await` in `toggleProject()`. Fixed home page `+page.server.ts` missing `HttpError` re-throw guard (inconsistent with all other server loads — HttpErrors were silently swallowed as `stats: null`). Fixed `buildFts5Query` filtering single-character words (`length >= 2`) to match `highlightSearchTerms` behavior — prevents noisy FTS5 matches on single chars that wouldn't get highlighted anyway. Added 6 tests: projects API HttpError re-throw, `getProjectDocs` error path, search `hasMore=false`, home page HttpError re-throw, `buildFts5Query` single-char filtering (2 cases). Test suite: 133 → 139 tests.
 - **Phase 35: UX Polish** — Three fixes: (1) Sidebar projects button now shows active/selected state when on `/projects` route (matching conversation highlight pattern). (2) Projects page distinguishes fetch errors from empty docs — shows "문서를 불러오는데 실패했습니다" error message instead of misleading "문서가 없습니다" on API failure. (3) Search shows immediate "검색 중..." feedback when typing (≥2 chars) instead of blank state during 300ms debounce + fetch; `isSearching` set before debounce timer, `searchPending` state tracks debounce/fetch phase. Test suite: 139 tests (pure template/state changes).
+- **Phase 36: Markdown Export** — Added conversation export to Markdown. Created `src/lib/export.ts` with `exportConversationToMarkdown()` that converts conversation metadata + all message content blocks (text, thinking, tool_use, tool_result, attachments, files, unknown types) into a well-structured Markdown document. Added `downloadMarkdown()` for client-side file download and `conversationFilename()` for safe filename generation. Added "↓ MD" export button in chat view header (`chat/[uuid]/+page.svelte`). Added 24 tests covering: title/metadata rendering, sender labels (나/Claude), all content block types, attachments/files, fallback on invalid JSON, filename sanitization, and edge cases. Test suite: 139 → 163 tests.
 
 ## Notes
 
@@ -59,7 +60,7 @@ All phases implemented. Tagged at `0.0.39`.
 
 - Semantic/embedding-based search
 - Conversation bookmarks and tags
-- Export to PDF/Markdown
+- Export to PDF (Markdown export implemented in Phase 36)
 - Automatic conversation-to-project matching
 - Light theme
 - Real-time filesystem watching
