@@ -6,7 +6,7 @@ Claude 웹에서 export한 대화 데이터를 기반으로, 실제 claude.ai와
 ## Tech Stack
 - **Frontend**: SvelteKit + TypeScript
 - **Database**: SQLite (better-sqlite3)
-- **Styling**: Tailwind CSS (다크모드 only)
+- **Styling**: Tailwind CSS (라이트/다크 모드, Claude.ai 디자인 시스템)
 - **Data Pipeline**: 빌드타임 JSON → SQLite 전처리
 
 ## Active Specs
@@ -23,6 +23,11 @@ Claude 웹에서 export한 대화 데이터를 기반으로, 실제 claude.ai와
 ### Supporting
 - [Projects View](projects-view.md) - 프로젝트 목록 표시
 - [Layout & Routing](layout-routing.md) - 전체 레이아웃 및 SvelteKit 라우팅
+
+### Design & Settings
+- [Design System](design-system-claude.md) - Claude.ai pixel-perfect 디자인 토큰 (폰트, 색상, 레이아웃)
+- [Settings Page](settings-page.md) - 설정 페이지 (/settings) UI
+- [Language & i18n](language-i18n.md) - 다국어 시스템 (한국어/영어, 확장 가능)
 
 ## Parking Lot
 - 시맨틱 검색 (임베딩 기반)
