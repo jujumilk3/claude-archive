@@ -1,0 +1,228 @@
+@import 'tailwindcss';
+@import 'highlight.js/styles/atom-one-dark.css';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/source-serif-4';
+@import '@fontsource-variable/jetbrains-mono';
+
+:root {
+	/* Gray scale palette (shared across themes) */
+	--_gray-0: 0 0% 100%;
+	--_gray-10: 60 14% 99%;
+	--_gray-20: 60 14% 97%;
+	--_gray-30: 60 10% 96%;
+	--_gray-40: 60 11% 95%;
+	--_gray-50: 45 12% 93%;
+	--_gray-100: 53 12% 87%;
+	--_gray-200: 55 9% 74%;
+	--_gray-350: 48 5% 57%;
+	--_gray-400: 45 3% 52%;
+	--_gray-500: 40 3% 42%;
+	--_gray-600: 45 3% 31%;
+	--_gray-700: 60 3% 21%;
+	--_gray-750: 60 2% 17%;
+	--_gray-800: 60 2% 12%;
+	--_gray-840: 60 2% 9%;
+	--_gray-860: 0 0% 7%;
+	--_gray-900: 0 0% 4%;
+
+	/* Brand color */
+	--_brand-clay: 14.8 63.1% 59.6%;
+
+	/* Font stacks */
+	--font-ui: 'Inter Variable', 'Pretendard', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--font-serif: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo, monospace;
+}
+
+/* Dark mode semantic tokens (default) */
+:root {
+	--bg-000: hsl(60 2.1% 18.4%);
+	--bg-primary: hsl(60 2.7% 14.5%);
+	--bg-sidebar: hsl(30 3.3% 11.8%);
+	--bg-message-human: hsl(60 2.6% 7.6%);
+	--bg-400: hsl(0 0% 0%);
+	--text-primary: hsl(48 33.3% 97.1%);
+	--text-secondary: hsl(50 9% 73.7%);
+	--text-muted: hsl(48 4.8% 59.2%);
+	--accent: hsl(var(--_brand-clay));
+	--border: hsl(51 16.5% 84.5% / 0.15);
+	--border-300: hsl(51 16.5% 84.5% / 0.15);
+	--code-bg: hsl(0 0% 0%);
+	--code-block-bg: hsl(var(--_gray-900) / 0.5);
+	--code-text: rgb(234, 236, 240);
+	--skeleton-mid: hsl(var(--_gray-600));
+	--danger-000: hsl(0 98.4% 75.1%);
+	--text-500: hsl(48 4.8% 59.2%);
+	--font-weight-response: 360;
+	--font-weight-bold: 530;
+	--font-weight-heading: 530;
+}
+
+/* Light mode semantic tokens */
+[data-mode="light"] {
+	--bg-000: hsl(0 0% 100%);
+	--bg-primary: hsl(48 33.3% 97.1%);
+	--bg-sidebar: hsl(53 28.6% 94.5%);
+	--bg-message-human: hsl(48 25% 92.2%);
+	--bg-400: hsl(50 20.7% 88.6%);
+	--text-primary: hsl(60 2.6% 7.6%);
+	--text-secondary: hsl(60 2.5% 23.3%);
+	--text-muted: hsl(51 3.1% 43.7%);
+	--accent: hsl(15 63.1% 59.6%);
+	--border: hsl(30 3.3% 11.8% / 0.15);
+	--border-300: hsl(51 16.5% 84.5%);
+	--code-bg: hsl(50 20.7% 88.6%);
+	--code-block-bg: hsl(0 0% 100% / 0.5);
+	--code-text: rgb(20, 24, 31);
+	--skeleton-mid: hsl(53 12% 87%);
+	--danger-000: hsl(0 58.6% 34.1%);
+	--text-500: hsl(51 3.1% 43.7%);
+	--font-weight-response: 400;
+	--font-weight-bold: 600;
+	--font-weight-heading: 600;
+}
+
+@theme {
+	--color-bg-primary: var(--bg-primary);
+	--color-bg-sidebar: var(--bg-sidebar);
+	--color-bg-message-human: var(--bg-message-human);
+	--color-text-primary: var(--text-primary);
+	--color-text-secondary: var(--text-secondary);
+	--color-text-muted: var(--text-muted);
+	--color-accent: var(--accent);
+	--color-border: var(--border);
+	--color-code-bg: var(--code-bg);
+}
+
+@keyframes shimmer {
+	0% { background-position: -200% 0; }
+	100% { background-position: 200% 0; }
+}
+
+.skeleton {
+	background: linear-gradient(90deg, var(--border) 25%, var(--skeleton-mid) 50%, var(--border) 75%);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite;
+	border-radius: 0.375rem;
+}
+
+mark {
+	background-color: hsl(var(--_brand-clay) / 0.4);
+	color: inherit;
+	padding: 0 1px;
+	border-radius: 2px;
+}
+
+/* Override hljs background to use wrapper's bg */
+.hljs {
+	background: transparent !important;
+	color: var(--code-text);
+}
+
+/* Markdown table in code blocks */
+.hljs-table-header { color: var(--danger-000); font-weight: 600; }
+.hljs-table-sep { opacity: 0.5; }
+
+/* Light mode syntax highlighting — matches Claude light theme */
+[data-mode="light"] .hljs { color: rgb(20, 24, 31); }
+[data-mode="light"] .hljs-keyword,
+[data-mode="light"] .hljs-selector-tag { color: rgb(184, 10, 24); }
+[data-mode="light"] .hljs-string,
+[data-mode="light"] .hljs-doctag { color: rgb(0, 128, 0); }
+[data-mode="light"] .hljs-comment { color: rgb(106, 115, 125); }
+[data-mode="light"] .hljs-number,
+[data-mode="light"] .hljs-literal { color: rgb(0, 92, 197); }
+[data-mode="light"] .hljs-title,
+[data-mode="light"] .hljs-title\\.class_,
+[data-mode="light"] .hljs-title\\.function_ { color: rgb(111, 66, 193); }
+[data-mode="light"] .hljs-built_in { color: rgb(227, 98, 9); }
+[data-mode="light"] .hljs-attr,
+[data-mode="light"] .hljs-attribute { color: rgb(184, 10, 24); }
+[data-mode="light"] .hljs-variable,
+[data-mode="light"] .hljs-template-variable { color: rgb(227, 98, 9); }
+[data-mode="light"] .hljs-type { color: rgb(227, 98, 9); }
+[data-mode="light"] .hljs-meta { color: rgb(0, 92, 197); }
+[data-mode="light"] .hljs-name,
+[data-mode="light"] .hljs-selector-id,
+[data-mode="light"] .hljs-selector-class { color: rgb(184, 10, 24); }
+[data-mode="light"] .hljs-section { color: rgb(0, 92, 197); font-weight: bold; }
+[data-mode="light"] .hljs-symbol,
+[data-mode="light"] .hljs-bullet { color: rgb(0, 92, 197); }
+[data-mode="light"] .hljs-addition { color: rgb(34, 134, 58); background-color: rgb(230, 255, 237); }
+[data-mode="light"] .hljs-deletion { color: rgb(179, 29, 40); background-color: rgb(255, 238, 240); }
+[data-mode="light"] .hljs-subst { color: rgb(43, 48, 59); }
+[data-mode="light"] .hljs-params { color: rgb(20, 24, 31); }
+
+
+html, body {
+	height: 100%;
+	margin: 0;
+	background-color: var(--bg-primary);
+	color: var(--text-primary);
+	font-family: var(--font-ui);
+	font-size: 16px;
+	line-height: 1.5;
+	font-weight: 430;
+}
+
+/* Typography: Claude responses use serif font */
+.claude-response {
+	font-family: var(--font-serif);
+	font-size: 1rem;
+	line-height: 1.65rem;
+	font-weight: var(--font-weight-response);
+}
+
+.claude-response strong,
+.claude-response b {
+	font-weight: var(--font-weight-bold);
+}
+
+/* Typography: User messages use sans font */
+.human-message {
+	font-family: var(--font-ui);
+	font-size: 1rem;
+	line-height: 1.4;
+	font-weight: 400;
+}
+
+/* Typography: Sidebar items */
+.sidebar-item {
+	font-family: var(--font-ui);
+	font-size: 0.75rem;
+	line-height: 1.4;
+	font-weight: 430;
+	height: 32px;
+}
+
+/* Code blocks use mono font */
+code, pre code {
+	font-family: var(--font-mono);
+	font-variant-ligatures: none;
+	font-feature-settings: "calt" 0, "liga" 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: hsl(var(--_gray-400));
+}
+
+/* Firefox scrollbar */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
+}

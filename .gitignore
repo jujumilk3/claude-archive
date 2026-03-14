@@ -1,0 +1,16 @@
+claude-exports/*
+!claude-exports/.gitkeep
+node_modules/
+.svelte-kit/
+data/
+ralph-working-records/
+build/
+dist/
+*.db
+.playwright-mcp/
+specs/
+AGENTS.md
+IMPLEMENTATION_PLAN.md
+PROMPT_build.md
+PROMPT_plan.md
+loop*.sh
