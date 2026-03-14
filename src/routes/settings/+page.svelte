@@ -43,7 +43,6 @@
 	function handleReset() {
 		resetSettings();
 		locale.set('ko');
-		applyTheme('dark');
 		applyFontSize('medium');
 	}
 

@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.43`.
+All phases implemented. Tagged at `0.0.44`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -56,6 +56,8 @@ All phases implemented. Tagged at `0.0.43`.
 - **Phase 41: Svelte API Consistency** — Migrated all 3 components using deprecated `$app/stores` (Svelte 4) to `$app/state` (Svelte 5 runes): `+layout.svelte` (`navigating`), `Sidebar.svelte` (`page`), `chat/[uuid]/+page.svelte` (`page`). Removed `$` prefix from store subscriptions (`$page` → `page`, `$navigating` → `navigating.to`). All components now consistently use the Svelte 5 `$app/state` module, matching `+error.svelte` which already used it. No remaining Svelte 4 API usage. Test suite: 208 tests (no new tests — import/access pattern changes only).
 
 - **Phase 42: i18n Plurals & Relative Time** — Two should-have features from the i18n spec. (1) **Plural handling**: Enhanced the `t` function and `getTranslation` to support automatic plural form selection via `Intl.PluralRules`. When a `count` parameter is provided, the system checks for `{key}_{category}` variants (e.g., `sidebar.resultCount_one` for count=1). Added `_one` plural keys for `sidebar.resultCount` and `projects.docCount` — English now correctly shows "1 result" vs "2 results" and "1 document" vs "2 documents". Korean uses the same form for all counts (no singular/plural distinction). (2) **Relative time in sidebar**: Wired the existing `formatRelativeTime` function into sidebar conversation items as an enhanced tooltip — hovering a conversation now shows relative time ("2시간 전" / "2 hours ago") with optional summary. Added 6 tests covering plural selection for both locales, count=0 edge case, and `getTranslation` plural support. Test suite: 208 → 214 tests.
+
+- **Phase 43: Design Spec Compliance & Bug Fixes** — Four fixes for spec compliance: (1) **Copy button i18n**: Code block copy button was hardcoded as "Copy" in English regardless of locale. Changed `markdown.ts` to render the button with a `data-default-label` attribute instead of hardcoded text; `Message.svelte` now sets button text via i18n `$t('message.copy')` on mount, so locale changes are reflected. (2) **Settings reset theme bug**: `handleReset()` in settings page hardcoded `applyTheme('dark')` instead of letting the `$effect` watching `$resolvedTheme` handle theme application after reset to 'system' default. Removed the hardcoded call. (3) **User bubble border-radius**: Changed from `rounded-2xl` (16px) to `rounded-xl` (12px) per design system spec. (4) **User bubble padding**: Changed from `py-3` (12px) to `py-[10px]` (10px) per spec's `10px 16px`. (5) **Chat header height**: Set `min-h-12` (48px) on header and changed alignment to `items-center` per spec's 48px header height. Test suite: 214 tests (no new tests — existing test updated to verify copy button data attribute).
 
 ---
 

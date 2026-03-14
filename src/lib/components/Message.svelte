@@ -105,9 +105,20 @@
 		}
 	}
 
+	function updateCopyLabels() {
+		if (!bubbleEl) return;
+		const btns = bubbleEl.querySelectorAll<HTMLButtonElement>('.copy-btn[data-default-label]');
+		btns.forEach((btn) => {
+			if (btn.dataset.defaultLabel === 'copy') {
+				btn.textContent = $t('message.copy');
+			}
+		});
+	}
+
 	$effect(() => {
 		if (!bubbleEl) return;
 		bubbleEl.addEventListener('click', handleClick);
+		updateCopyLabels();
 		return () => bubbleEl.removeEventListener('click', handleClick);
 	});
 </script>
@@ -118,7 +129,7 @@
 >
 	<div
 		bind:this={bubbleEl}
-		class="msg-bubble max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
+		class="msg-bubble max-w-[85%] rounded-xl px-4 py-[10px] {sender === 'human'
 			? 'bg-bg-message-human text-text-primary human-message'
 			: 'text-text-primary claude-response'}"
 	>

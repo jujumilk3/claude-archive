@@ -111,6 +111,7 @@ describe('renderMarkdown', () => {
 		expect(result).toContain('class="line-number"');
 		expect(result).toContain('class="line-content"');
 		expect(result).toContain('class="copy-btn');
+		expect(result).toContain('data-default-label="copy"');
 		expect(result).toContain('>js<');
 	});
 

@@ -43,7 +43,7 @@
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-bg-primary">
 	<header class="border-b border-border">
-		<div class="mx-auto flex max-w-3xl items-start justify-between px-6 py-3 pl-12 md:pl-6">
+		<div class="mx-auto flex min-h-12 max-w-3xl items-center justify-between px-6 pl-12 md:pl-6">
 			<div class="min-w-0 flex-1">
 				<h1 class="text-lg font-medium text-text-primary">
 					{data.conversation.name || $t('common.noTitle')}

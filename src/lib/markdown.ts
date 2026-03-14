@@ -81,7 +81,7 @@ const marked = new Marked({
 			return `<div class="code-block-wrapper group relative my-3 overflow-hidden rounded-lg bg-code-bg">
 				<div class="flex items-center justify-between border-b border-border px-4 py-1.5">
 					<span class="text-xs text-text-secondary">${escapeAttr(detectedLang)}</span>
-					<button class="copy-btn text-xs text-text-secondary hover:text-text-primary" data-code="${escapeAttr(text)}">Copy</button>
+					<button class="copy-btn text-xs text-text-secondary hover:text-text-primary" data-code="${escapeAttr(text)}" data-default-label="copy"></button>
 				</div>
 				<pre class="max-h-[500px] overflow-auto p-4 leading-relaxed"><code class="hljs text-sm">${lineNumbersHtml}</code></pre>
 			</div>`;
