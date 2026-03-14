@@ -1,4 +1,6 @@
 import type { ConversationDetail, Message } from '$lib/db/queries';
+import { getTranslation, formatTimestamp, senderLabel } from '$lib/i18n';
+import type { Locale } from '$lib/i18n';
 
 interface ContentBlock {
 	type: string;
@@ -8,20 +10,6 @@ interface ContentBlock {
 	content?: Array<{ type: string; text: string }> | string;
 	is_error?: boolean;
 	thinking?: string;
-}
-
-function formatTimestamp(isoDate: string): string {
-	return new Date(isoDate).toLocaleString('ko-KR', {
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit'
-	});
-}
-
-function senderLabel(sender: string): string {
-	return sender === 'human' ? '나' : 'Claude';
 }
 
 function getToolResultText(block: ContentBlock): string {
@@ -75,10 +63,10 @@ function parseFiles(json: string): Array<{ file_name: string }> {
 	}
 }
 
-function renderMessage(msg: Message): string {
+function renderMessage(msg: Message, loc: Locale): string {
 	const parts: string[] = [];
 
-	parts.push(`### ${senderLabel(msg.sender)} — ${formatTimestamp(msg.created_at)}`);
+	parts.push(`### ${senderLabel(msg.sender, loc)} — ${formatTimestamp(msg.created_at, loc)}`);
 	parts.push('');
 
 	const attachments = parseAttachments(msg.attachments_json);
@@ -120,10 +108,10 @@ function renderMessage(msg: Message): string {
 	return parts.join('\n');
 }
 
-export function exportConversationToMarkdown(conversation: ConversationDetail, messages: Message[]): string {
+export function exportConversationToMarkdown(conversation: ConversationDetail, messages: Message[], loc: Locale = 'ko'): string {
 	const parts: string[] = [];
 
-	parts.push(`# ${conversation.name || '(제목 없음)'}`);
+	parts.push(`# ${conversation.name || getTranslation('common.noTitle', loc)}`);
 	parts.push('');
 
 	if (conversation.summary) {
@@ -131,14 +119,14 @@ export function exportConversationToMarkdown(conversation: ConversationDetail, m
 		parts.push('');
 	}
 
-	parts.push(`- **생성일**: ${formatTimestamp(conversation.created_at)}`);
-	parts.push(`- **수정일**: ${formatTimestamp(conversation.updated_at)}`);
+	parts.push(`- **${getTranslation('export.createdAt', loc)}**: ${formatTimestamp(conversation.created_at, loc)}`);
+	parts.push(`- **${getTranslation('export.updatedAt', loc)}**: ${formatTimestamp(conversation.updated_at, loc)}`);
 	parts.push('');
 	parts.push('---');
 	parts.push('');
 
 	for (const msg of messages) {
-		parts.push(renderMessage(msg));
+		parts.push(renderMessage(msg, loc));
 	}
 
 	return parts.join('\n').trimEnd() + '\n';

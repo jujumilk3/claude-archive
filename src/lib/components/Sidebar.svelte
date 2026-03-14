@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { t, locale, formatMonthYear } from '$lib/i18n';
 
 	interface Conversation {
 		uuid: string;
@@ -93,6 +94,7 @@
 
 	const currentUuid = $derived($page.params?.uuid || '');
 	const isProjectsPage = $derived($page.url?.pathname === '/projects');
+	const isSettingsPage = $derived($page.url?.pathname === '/settings');
 
 	$effect(() => {
 		if (!initialized) {
@@ -232,7 +234,7 @@
 	function getDisplayName(conv: Conversation): string {
 		if (conv.name) return conv.name;
 		if (conv.first_message_preview) return conv.first_message_preview;
-		return '(제목 없음)';
+		return $t('common.noTitle');
 	}
 
 	function groupByDate(items: Conversation[]): DateGroup[] {
@@ -256,15 +258,15 @@
 		for (const conv of items) {
 			const d = new Date(conv.updated_at);
 			if (d >= today) {
-				addToGroup('오늘', conv);
+				addToGroup($t('date.today'), conv);
 			} else if (d >= yesterday) {
-				addToGroup('어제', conv);
+				addToGroup($t('date.yesterday'), conv);
 			} else if (d >= last7) {
-				addToGroup('지난 7일', conv);
+				addToGroup($t('date.last7days'), conv);
 			} else if (d >= last30) {
-				addToGroup('지난 30일', conv);
+				addToGroup($t('date.last30days'), conv);
 			} else {
-				const label = `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+				const label = formatMonthYear(d, $locale);
 				addToGroup(label, conv);
 			}
 		}
@@ -283,8 +285,8 @@
 		<div class="relative">
 			<input
 				type="text"
-				placeholder="검색... (⌘K)"
-				aria-label="대화 검색"
+				placeholder={$t('sidebar.searchPlaceholder')}
+				aria-label={$t('sidebar.searchAriaLabel')}
 				bind:value={searchQuery}
 				bind:this={searchInputEl}
 				oninput={handleSearchInput}
@@ -296,7 +298,7 @@
 			{#if searchQuery}
 				<button
 					onclick={clearSearch}
-					aria-label="검색 지우기"
+					aria-label={$t('common.clearSearch')}
 					class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
 				>
 					✕
@@ -305,7 +307,7 @@
 			{#if showHistory}
 				<div class="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-border bg-bg-sidebar py-1 shadow-lg">
 					<div class="flex items-center justify-between px-3 py-1">
-						<span class="text-xs text-text-secondary">최근 검색</span>
+						<span class="text-xs text-text-secondary">{$t('sidebar.recentSearches')}</span>
 					</div>
 					{#each searchHistory as term}
 						<div class="group flex items-center">
@@ -317,7 +319,7 @@
 							</button>
 							<button
 								onclick={() => removeHistoryItem(term)}
-								aria-label="{term} 검색 기록 삭제"
+								aria-label={$t('sidebar.deleteHistoryAriaLabel', { term })}
 								class="mr-2 text-xs text-text-secondary opacity-0 hover:text-text-primary focus:opacity-100 group-hover:opacity-100"
 							>
 								✕
@@ -336,11 +338,11 @@
 	>
 		{#if isSearching}
 			{#if searchPending}
-				<div class="py-4 text-center text-sm text-text-secondary">검색 중...</div>
+				<div class="py-4 text-center text-sm text-text-secondary">{$t('sidebar.searching')}</div>
 			{:else if searchResults.length === 0}
-				<p class="px-3 py-4 text-center text-sm text-text-secondary">검색 결과가 없습니다</p>
+				<p class="px-3 py-4 text-center text-sm text-text-secondary">{$t('sidebar.noResults')}</p>
 			{:else}
-				<p class="px-3 py-1 text-xs text-text-secondary">{searchTotal}개 결과</p>
+				<p class="px-3 py-1 text-xs text-text-secondary">{$t('sidebar.resultCount', { count: searchTotal })}</p>
 				{#each searchResults as result, i}
 					<button
 						data-result-index={i}
@@ -348,8 +350,8 @@
 						class="mb-1 w-full rounded-md px-3 py-2 text-left {selectedIndex === i ? 'bg-bg-primary ring-1 ring-accent' : 'hover:bg-bg-primary'}"
 					>
 						<div class="flex items-center gap-1.5 text-sm">
-							<span class="truncate text-text-primary">{result.conversation_name || '(제목 없음)'}</span>
-							<span class="shrink-0 text-xs text-text-secondary">· {result.message_sender === 'human' ? '나' : 'Claude'}</span>
+							<span class="truncate text-text-primary">{result.conversation_name || $t('common.noTitle')}</span>
+							<span class="shrink-0 text-xs text-text-secondary">· {result.message_sender === 'human' ? $t('common.senderHuman') : $t('common.senderAssistant')}</span>
 						</div>
 						<div class="mt-0.5 line-clamp-2 text-xs text-text-secondary">
 							{@html result.snippet}
@@ -357,7 +359,7 @@
 					</button>
 				{/each}
 				{#if searchLoading}
-					<div class="py-4 text-center text-sm text-text-secondary">로딩 중...</div>
+					<div class="py-4 text-center text-sm text-text-secondary">{$t('common.loading')}</div>
 				{/if}
 			{/if}
 		{:else}
@@ -387,11 +389,11 @@
 					{/each}
 				</div>
 			{:else if loading}
-				<div class="py-4 text-center text-sm text-text-secondary">로딩 중...</div>
+				<div class="py-4 text-center text-sm text-text-secondary">{$t('common.loading')}</div>
 			{/if}
 
 			{#if conversations.length === 0 && !loading}
-				<p class="px-3 py-4 text-center text-sm text-text-secondary">대화가 없습니다</p>
+				<p class="px-3 py-4 text-center text-sm text-text-secondary">{$t('sidebar.noConversations')}</p>
 			{/if}
 		{/if}
 	</nav>
@@ -403,7 +405,15 @@
 				? 'bg-bg-primary text-text-primary'
 				: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"
 		>
-			📁 프로젝트
+			📁 {$t('sidebar.projects')}
+		</button>
+		<button
+			onclick={() => { goto('/settings'); onNavigate?.(); }}
+			class="w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors {isSettingsPage
+				? 'bg-bg-primary text-text-primary'
+				: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"
+		>
+			⚙️ {$t('settings.title')}
 		</button>
 	</div>
 </aside>

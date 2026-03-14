@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { renderMarkdown, highlightSearchTerms } from '$lib/markdown';
+	import { t, locale, formatTimestamp } from '$lib/i18n';
 
 	interface ContentBlock {
 		type: string;
@@ -47,15 +48,7 @@
 	}: Props = $props();
 
 	const formattedTime = $derived(
-		createdAt
-			? new Date(createdAt).toLocaleString('ko-KR', {
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit'
-				})
-			: ''
+		createdAt ? formatTimestamp(createdAt, $locale) : ''
 	);
 
 	const content: ContentBlock[] = $derived((() => {
@@ -85,8 +78,8 @@
 		}
 	})());
 
-	function renderText(t: string): string {
-		const html = renderMarkdown(t);
+	function renderText(input: string): string {
+		const html = renderMarkdown(input);
 		if (searchQuery) {
 			return highlightSearchTerms(html, searchQuery);
 		}
@@ -114,9 +107,9 @@
 		if (target.classList.contains('copy-btn')) {
 			const code = target.dataset.code || '';
 			navigator.clipboard.writeText(code).catch(() => {});
-			target.textContent = 'Copied!';
+			target.textContent = $t('message.copied');
 			setTimeout(() => {
-				target.textContent = 'Copy';
+				target.textContent = $t('message.copy');
 			}, 1500);
 		}
 	}
@@ -174,7 +167,7 @@
 			{:else if block.type === 'thinking' && block.thinking}
 				<details class="my-2 rounded-lg border border-border">
 					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
-						💭 Thinking
+						💭 {$t('message.thinking')}
 					</summary>
 					<div class="markdown-body max-h-[400px] overflow-auto border-t border-border p-3 text-xs leading-relaxed text-text-secondary">
 						{@html renderMarkdown(block.thinking)}
@@ -183,7 +176,7 @@
 			{:else if block.type === 'thinking' && block.text}
 				<details class="my-2 rounded-lg border border-border">
 					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
-						💭 Thinking
+						💭 {$t('message.thinking')}
 					</summary>
 					<div class="markdown-body max-h-[400px] overflow-auto border-t border-border p-3 text-xs leading-relaxed text-text-secondary">
 						{@html renderMarkdown(block.text)}
@@ -199,7 +192,7 @@
 			{:else if block.type === 'tool_result'}
 				<details class="my-2 rounded-lg border border-border">
 					<summary class="cursor-pointer px-3 py-2 text-xs text-text-secondary hover:text-text-primary">
-						📋 Result{block.is_error ? ' (error)' : ''}{block.name ? `: ${block.name}` : ''}
+						📋 {$t('message.result')}{block.is_error ? ` ${$t('message.resultError')}` : ''}{block.name ? `: ${block.name}` : ''}
 					</summary>
 					<pre class="max-h-[300px] overflow-auto border-t border-border p-3"><code class="text-xs text-text-secondary">{getToolResultText(block)}</code></pre>
 				</details>

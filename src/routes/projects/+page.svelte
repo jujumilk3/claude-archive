@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { renderMarkdown } from '$lib/markdown';
+	import { t, locale, formatShortDate } from '$lib/i18n';
 
 	let { data }: { data: PageData } = $props();
 
@@ -56,33 +57,33 @@
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-bg-primary">
 	<header class="border-b border-border px-6 py-3 pl-12 md:pl-6">
 		<div class="flex items-center gap-4">
-			<h1 class="text-lg font-medium text-text-primary">프로젝트</h1>
+			<h1 class="text-lg font-medium text-text-primary">{$t('projects.title')}</h1>
 			<div class="relative flex-1 max-w-xs">
 				<input
 					type="text"
-					placeholder="프로젝트 검색..."
-					aria-label="프로젝트 검색"
+					placeholder={$t('projects.searchPlaceholder')}
+					aria-label={$t('projects.searchAriaLabel')}
 					bind:value={filterQuery}
 					class="w-full rounded-md border border-border bg-bg-sidebar px-3 py-1 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-accent"
 				/>
 				{#if filterQuery}
 					<button
 						onclick={() => (filterQuery = '')}
-						aria-label="검색 지우기"
+						aria-label={$t('common.clearSearch')}
 						class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
 					>✕</button>
 				{/if}
 			</div>
-			<span class="text-xs text-text-secondary">{filteredProjects.length}개</span>
+			<span class="text-xs text-text-secondary">{$t('projects.count', { count: filteredProjects.length })}</span>
 		</div>
 	</header>
 
 	<div class="flex-1 overflow-y-auto">
 		<div class="mx-auto max-w-3xl px-4 py-6">
 			{#if data.projects.length === 0}
-				<p class="text-center text-text-secondary">프로젝트가 없습니다</p>
+				<p class="text-center text-text-secondary">{$t('projects.noProjects')}</p>
 			{:else if filteredProjects.length === 0}
-				<p class="text-center text-text-secondary">일치하는 프로젝트가 없습니다</p>
+				<p class="text-center text-text-secondary">{$t('projects.noMatch')}</p>
 			{:else}
 				{#each filteredProjects as project}
 					<div class="mb-3 rounded-lg border border-border">
@@ -98,8 +99,8 @@
 								{/if}
 							</div>
 							<div class="flex items-center gap-3 text-xs text-text-secondary">
-								<span>{project.doc_count}개 문서</span>
-								<span>{new Date(project.created_at).toLocaleDateString('ko-KR')}</span>
+								<span>{$t('projects.docCount', { count: project.doc_count })}</span>
+								<span>{formatShortDate(project.created_at, $locale)}</span>
 								<span class="transition-transform {expandedUuid === project.uuid ? 'rotate-180' : ''}">▼</span>
 							</div>
 						</button>
@@ -110,11 +111,11 @@
 									<p class="mb-3 text-sm text-text-secondary">{project.description}</p>
 								{/if}
 								{#if loadingDocs}
-									<p class="text-sm text-text-secondary">로딩 중...</p>
+									<p class="text-sm text-text-secondary">{$t('common.loading')}</p>
 								{:else if docsError}
-									<p class="text-sm text-red-400">문서를 불러오는데 실패했습니다</p>
+									<p class="text-sm text-red-400">{$t('projects.docsFetchError')}</p>
 								{:else if docs.length === 0}
-									<p class="text-sm text-text-secondary">문서가 없습니다</p>
+									<p class="text-sm text-text-secondary">{$t('projects.noDocs')}</p>
 								{:else}
 									{#each docs as doc}
 										<details class="mb-2">

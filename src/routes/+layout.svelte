@@ -3,6 +3,7 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { browser } from '$app/environment';
 	import { navigating } from '$app/stores';
+	import { t } from '$lib/i18n';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
@@ -72,7 +73,7 @@
 			<button
 				class="fixed inset-0 z-30 bg-black/50"
 				onclick={() => (sidebarCollapsed = true)}
-				aria-label="사이드바 닫기"
+				aria-label={$t('sidebar.closeSidebar')}
 			></button>
 			<div class="fixed inset-y-0 left-0 z-40 w-[260px]">
 				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
@@ -100,8 +101,8 @@
 		<button
 			onclick={toggleSidebar}
 			class="absolute left-3 top-3 z-10 rounded-md p-1.5 text-text-secondary hover:bg-bg-sidebar hover:text-text-primary"
-			title={sidebarCollapsed ? '사이드바 열기 (⌘B)' : '사이드바 닫기 (⌘B)'}
-			aria-label={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
+			title={sidebarCollapsed ? $t('sidebar.openSidebarShortcut') : $t('sidebar.closeSidebarShortcut')}
+			aria-label={sidebarCollapsed ? $t('sidebar.openSidebar') : $t('sidebar.closeSidebar')}
 		>
 			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<path d="M3 12h18M3 6h18M3 18h18" />

@@ -3,6 +3,7 @@
 	import { tick } from 'svelte';
 	import Message from '$lib/components/Message.svelte';
 	import { exportConversationToMarkdown, downloadMarkdown, conversationFilename } from '$lib/export';
+	import { t } from '$lib/i18n';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -45,7 +46,7 @@
 		<div class="mx-auto flex max-w-3xl items-start justify-between px-6 py-3 pl-12 md:pl-6">
 			<div class="min-w-0 flex-1">
 				<h1 class="text-lg font-medium text-text-primary">
-					{data.conversation.name || '(제목 없음)'}
+					{data.conversation.name || $t('common.noTitle')}
 				</h1>
 				{#if data.conversation.summary}
 					<p class="mt-1 line-clamp-2 text-sm text-text-secondary">{data.conversation.summary}</p>
@@ -54,8 +55,8 @@
 			<button
 				onclick={handleExport}
 				class="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs text-text-secondary transition-colors hover:bg-bg-secondary hover:text-text-primary"
-				aria-label="대화를 Markdown으로 내보내기"
-				title="Markdown으로 내보내기"
+				aria-label={$t('chat.exportAriaLabel')}
+				title={$t('chat.exportTitle')}
 			>
 				↓ MD
 			</button>
@@ -65,7 +66,7 @@
 	<div class="flex-1 overflow-y-auto">
 		<div class="mx-auto max-w-3xl px-4 py-6">
 			{#if data.messages.length === 0}
-				<p class="text-center text-text-secondary">이 대화에는 메시지가 없습니다</p>
+				<p class="text-center text-text-secondary">{$t('chat.noMessages')}</p>
 			{:else}
 				{#each data.messages as msg}
 					<Message

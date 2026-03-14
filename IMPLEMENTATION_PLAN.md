@@ -45,6 +45,42 @@ All phases implemented. Tagged at `0.0.43`.
 - **Phase 35: UX Polish** — Three fixes: (1) Sidebar projects button now shows active/selected state when on `/projects` route (matching conversation highlight pattern). (2) Projects page distinguishes fetch errors from empty docs — shows "문서를 불러오는데 실패했습니다" error message instead of misleading "문서가 없습니다" on API failure. (3) Search shows immediate "검색 중..." feedback when typing (≥2 chars) instead of blank state during 300ms debounce + fetch; `isSearching` set before debounce timer, `searchPending` state tracks debounce/fetch phase. Test suite: 139 tests (pure template/state changes).
 - **Phase 36: Markdown Export** — Added conversation export to Markdown. Created `src/lib/export.ts` with `exportConversationToMarkdown()` that converts conversation metadata + all message content blocks (text, thinking, tool_use, tool_result, attachments, files, unknown types) into a well-structured Markdown document. Added `downloadMarkdown()` for client-side file download and `conversationFilename()` for safe filename generation. Added "↓ MD" export button in chat view header (`chat/[uuid]/+page.svelte`). Added 24 tests covering: title/metadata rendering, sender labels (나/Claude), all content block types, attachments/files, fallback on invalid JSON, filename sanitization, and edge cases. Test suite: 139 → 163 tests.
 
+- **Phase 37: i18n Component Migration & Tests** — Migrated all remaining hardcoded strings to i18n `$t()` calls across 3 components: `chat/[uuid]/+page.svelte` (4 Korean strings → `common.noTitle`, `chat.exportAriaLabel`, `chat.exportTitle`, `chat.noMessages`), `projects/+page.svelte` (12 strings including title, search, empty states, doc counts, loading, error messages; replaced hardcoded `toLocaleDateString('ko-KR')` with i18n `formatShortDate`), `Message.svelte` (5 English strings → `message.thinking`, `message.result`, `message.resultError`, `message.copy`, `message.copied`). Added 5 new `message.*` keys to `types.ts`, `ko.ts`, and `en.ts`. Added 26 i18n unit tests covering store reactivity, parameter interpolation, missing key fallback, all formatting helpers per locale, `senderLabel`, `availableLocales`, and locale file completeness. All components now fully use the i18n system. Test suite: 163 → 189 tests.
+
+---
+
+## Remaining Work
+
+Gaps between specs and implementation, ordered by priority. Specs for these features were added in commit `8772e34`.
+
+### HIGH Priority — Core Functionality Gaps
+
+- ~~**i18n: Remaining Component Migration**~~ ✅ Completed (Phase 37). All 3 components migrated: `chat/[uuid]/+page.svelte` (4 strings), `projects/+page.svelte` (12 strings + locale-aware date formatting), `Message.svelte` (5 strings). Added 5 new `message.*` translation keys to types, `ko.ts`, and `en.ts`.
+
+- ~~**i18n: Test Coverage**~~ ✅ Completed (Phase 37). Added 26 tests covering: `t()` store reactivity on locale change, parameter interpolation, missing key fallback, `getTranslation` non-reactive API, `formatDate`/`formatMonthYear`/`formatNumber`/`formatTimestamp`/`formatShortDate` output per locale, `senderLabel` mapping, `availableLocales` shape, locale file completeness validation, and `message.*` key existence checks.
+
+- **Settings Page** (`specs/settings-page.md`) — No `/settings` route exists. Create `src/routes/settings/+page.svelte` with three sections: General (language dropdown using i18n system), Appearance (Light/Dark/System theme toggle, font size selector Small/Medium/Large), Data (export all button, reset to defaults). Persist all settings to localStorage under `claude-archive-settings` key with `AppSettings` typed schema. Sidebar already has a settings link (`$t('settings.title')`) but it 404s. Changes should apply immediately without a save button. Handle edge cases: localStorage unavailable, corrupted values (fallback to defaults), SSR theme flash prevention via inline `<head>` script.
+
+### MEDIUM Priority — Design & Visual Fidelity
+
+- **Design System: Custom Fonts** (`specs/design-system-claude.md`) — No `static/fonts/` directory or `@font-face` declarations exist. Current font stack is `'Pretendard', -apple-system, ...` (system fonts). Spec requires Anthropic Sans (UI, user messages), Anthropic Serif (Claude responses), and Anthropic Mono (code blocks) hosted as `.woff2` files in `static/fonts/`. Add `@font-face` declarations and CSS custom properties (`--font-ui`, `--font-serif`, `--font-mono`). Apply Serif to Claude response text and Sans to user message text. Verify CJK glyph support; configure fallback font chain for graceful degradation if custom fonts fail to load.
+
+- **Design System: Full Color Token System** (`specs/design-system-claude.md`) — Current `app.css` uses 8 simplified CSS variables (hex values). Spec defines a comprehensive HSL-based gray scale (`--_gray-0` through `--_gray-900`) and semantic tokens (`--bg-000` through `--bg-400`, `--text-100/200/400`, `--border-100`, `--accent-brand`). Migrate existing CSS custom properties to match the spec's token names and values for pixel-perfect fidelity with claude.ai. This is a refactor of existing styles, not new functionality.
+
+- **Design System: Typography Tokens** (`specs/design-system-claude.md`) — Spec defines exact typography values: Claude responses at Serif 16px/24px weight 400, user messages at Sans 16px/22.4px weight 430, sidebar items at Sans 12px/16px weight 430 height 32px. Current implementation approximates these but is not pixel-perfect. Align all typography CSS to match spec values exactly.
+
+### LOW Priority — Polish & Consistency
+
+- **Design System: Light Mode** (`specs/design-system-claude.md`) — Dark mode only (documented as intentional in AGENTS.md). No `data-mode` attribute system, no `prefers-color-scheme` listener. Depends on settings page (theme toggle) and full color token system. Scope: define `[data-mode="light"]` semantic token overrides, implement theme switching logic in a Svelte store, add FOUC prevention script in `app.html`.
+
+- **Svelte API Consistency** — Mixed Svelte 4/5 API usage across components. `chat/[uuid]/+page.svelte` and `Sidebar.svelte` use `$app/stores` (Svelte 4 pattern), while `+error.svelte` uses `$app/state` (Svelte 5 runes). Should standardize on one approach across all components.
+
+- **ContentBlock Interface Duplication** — `ContentBlock` interface is defined separately in both `src/lib/export.ts` and `src/lib/components/Message.svelte`. Extract to a shared types file to avoid drift.
+
+- **Test Quality Issues** — (1) `db.test.ts` `'ingested data'` describe block returns silently without assertion if `archive.db` is missing (soft-skip without visibility). (2) `search.test.ts` FTS5 integration uses first `it` block for setup instead of `beforeAll`. (3) `export.test.ts` has no tests exercising the `'en'` locale parameter.
+
+---
+
 ## Notes
 
 ### Spec Divergences (Intentional)
@@ -54,6 +90,13 @@ All phases implemented. Tagged at `0.0.43`.
 - **Chat view skeleton UI** — Unnecessary with SSR (Phase 10); data loads before page renders.
 - **`creator` in project API response** — Spec defines a `creator` object but the DB schema has no `user` table (users.json is ignored per data-pipeline spec); field omitted.
 
+### Implementation Order Notes
+
+- i18n component migration can proceed immediately — the infrastructure is already in place.
+- Settings page depends on i18n being fully migrated (language selector must use the i18n system).
+- Light mode depends on both the settings page (theme toggle UI) and the full color token system (light-mode semantic tokens). It should be tackled last.
+- Custom fonts and color tokens can be done independently of each other and of the settings/i18n work.
+
 ---
 
 ## Not In Scope (Parking Lot)
@@ -62,6 +105,5 @@ All phases implemented. Tagged at `0.0.43`.
 - Conversation bookmarks and tags
 - Export to PDF (Markdown export implemented in Phase 36)
 - Automatic conversation-to-project matching
-- Light theme
 - Real-time filesystem watching
 - Direct Claude API data fetching
