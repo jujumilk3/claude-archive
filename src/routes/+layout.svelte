@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 	import { navigating } from '$app/stores';
 	import { t } from '$lib/i18n';
+	import { settings, resolvedTheme, applyTheme, applyFontSize } from '$lib/stores/settings';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
@@ -24,6 +25,9 @@
 			};
 			mq.addEventListener('change', handler);
 			if (isMobile) sidebarCollapsed = true;
+
+			applyTheme($resolvedTheme);
+			applyFontSize($settings.fontSize);
 
 			return () => mq.removeEventListener('change', handler);
 		}

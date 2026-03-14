@@ -23,7 +23,7 @@
 					<p class="mt-1 text-sm text-text-secondary">{$t('home.projects')}</p>
 				</div>
 			</div>
-			{#if data.stats.oldest_conversation}
+			{#if data.stats.oldest_conversation && data.stats.newest_conversation}
 				<p class="mt-4 text-sm text-text-secondary">
 					{formatDate(new Date(data.stats.oldest_conversation), $locale)} — {formatDate(new Date(data.stats.newest_conversation), $locale)}
 				</p>

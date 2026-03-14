@@ -47,6 +47,8 @@ All phases implemented. Tagged at `0.0.43`.
 
 - **Phase 37: i18n Component Migration & Tests** — Migrated all remaining hardcoded strings to i18n `$t()` calls across 3 components: `chat/[uuid]/+page.svelte` (4 Korean strings → `common.noTitle`, `chat.exportAriaLabel`, `chat.exportTitle`, `chat.noMessages`), `projects/+page.svelte` (12 strings including title, search, empty states, doc counts, loading, error messages; replaced hardcoded `toLocaleDateString('ko-KR')` with i18n `formatShortDate`), `Message.svelte` (5 English strings → `message.thinking`, `message.result`, `message.resultError`, `message.copy`, `message.copied`). Added 5 new `message.*` keys to `types.ts`, `ko.ts`, and `en.ts`. Added 26 i18n unit tests covering store reactivity, parameter interpolation, missing key fallback, all formatting helpers per locale, `senderLabel`, `availableLocales`, and locale file completeness. All components now fully use the i18n system. Test suite: 163 → 189 tests.
 
+- **Phase 38: Settings Page** — Created `/settings` route with three sections: General (language dropdown using i18n system), Appearance (theme toggle Light/Dark/System with live switching + font size selector Small/Medium/Large), Data (Export All button via `/api/export` endpoint). Created `src/lib/stores/settings.ts` Svelte store managing theme and fontSize with localStorage persistence under `claude-archive-settings` key (merge-safe with existing i18n language field). Added light mode CSS color tokens via `[data-mode="light"]` selector in `app.css`. Added FOUC prevention inline script in `app.html` that reads settings and applies `data-mode` + font size before paint. System theme tracks OS preference via `matchMedia` listener. Reset-to-defaults button. Fixed pre-existing TypeScript error in home page (`newest_conversation` nullable check). Created `/api/export` endpoint for bulk markdown export. Test suite: 189 → 203 tests (14 new settings store tests covering load/save/defaults/validation/theme resolution/font size mapping/reset).
+
 ---
 
 ## Remaining Work
@@ -59,7 +61,7 @@ Gaps between specs and implementation, ordered by priority. Specs for these feat
 
 - ~~**i18n: Test Coverage**~~ ✅ Completed (Phase 37). Added 26 tests covering: `t()` store reactivity on locale change, parameter interpolation, missing key fallback, `getTranslation` non-reactive API, `formatDate`/`formatMonthYear`/`formatNumber`/`formatTimestamp`/`formatShortDate` output per locale, `senderLabel` mapping, `availableLocales` shape, locale file completeness validation, and `message.*` key existence checks.
 
-- **Settings Page** (`specs/settings-page.md`) — No `/settings` route exists. Create `src/routes/settings/+page.svelte` with three sections: General (language dropdown using i18n system), Appearance (Light/Dark/System theme toggle, font size selector Small/Medium/Large), Data (export all button, reset to defaults). Persist all settings to localStorage under `claude-archive-settings` key with `AppSettings` typed schema. Sidebar already has a settings link (`$t('settings.title')`) but it 404s. Changes should apply immediately without a save button. Handle edge cases: localStorage unavailable, corrupted values (fallback to defaults), SSR theme flash prevention via inline `<head>` script.
+- ~~**Settings Page**~~ ✅ Completed (Phase 38). Created `/settings` route (General, Appearance, Data sections), `src/lib/stores/settings.ts` with localStorage persistence, light mode CSS tokens, FOUC prevention script, `/api/export` endpoint. Test suite: 189 → 203 tests.
 
 ### MEDIUM Priority — Design & Visual Fidelity
 
@@ -71,7 +73,7 @@ Gaps between specs and implementation, ordered by priority. Specs for these feat
 
 ### LOW Priority — Polish & Consistency
 
-- **Design System: Light Mode** (`specs/design-system-claude.md`) — Dark mode only (documented as intentional in AGENTS.md). No `data-mode` attribute system, no `prefers-color-scheme` listener. Depends on settings page (theme toggle) and full color token system. Scope: define `[data-mode="light"]` semantic token overrides, implement theme switching logic in a Svelte store, add FOUC prevention script in `app.html`.
+- **Design System: Light Mode** (`specs/design-system-claude.md`) — Partially implemented (Phase 38). Theme toggle (Light/Dark/System), `[data-mode="light"]` CSS token overrides in `app.css`, FOUC prevention inline script in `app.html`, and OS preference tracking via `matchMedia` are all in place. Remaining work: pixel-perfect color alignment — migrate the light mode token values to match the spec's HSL-based gray scale and semantic token names (`--bg-000` through `--bg-400`, `--text-100/200/400`, etc.). Depends on the full color token system refactor (Design System: Full Color Token System above).
 
 - **Svelte API Consistency** — Mixed Svelte 4/5 API usage across components. `chat/[uuid]/+page.svelte` and `Sidebar.svelte` use `$app/stores` (Svelte 4 pattern), while `+error.svelte` uses `$app/state` (Svelte 5 runes). Should standardize on one approach across all components.
 
