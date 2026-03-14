@@ -14,6 +14,7 @@ const ko: Translations = {
 	'sidebar.searching': '검색 중...',
 	'sidebar.noResults': '검색 결과가 없습니다',
 	'sidebar.resultCount': '{count}개 결과',
+	'sidebar.resultCount_one': '{count}개 결과',
 	'sidebar.noConversations': '대화가 없습니다',
 	'sidebar.projects': '프로젝트',
 	'sidebar.closeSidebar': '사이드바 닫기',
@@ -46,6 +47,7 @@ const ko: Translations = {
 	'projects.noProjects': '프로젝트가 없습니다',
 	'projects.noMatch': '일치하는 프로젝트가 없습니다',
 	'projects.docCount': '{count}개 문서',
+	'projects.docCount_one': '{count}개 문서',
 	'projects.docsFetchError': '문서를 불러오는데 실패했습니다',
 	'projects.noDocs': '문서가 없습니다',
 

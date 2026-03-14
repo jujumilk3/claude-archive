@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { t, locale, formatMonthYear } from '$lib/i18n';
+	import { t, locale, formatMonthYear, formatRelativeTime } from '$lib/i18n';
 
 	interface Conversation {
 		uuid: string;
@@ -369,7 +369,7 @@
 					{#each group.conversations as conv}
 						<button
 							onclick={() => { goto(`/chat/${conv.uuid}`); onNavigate?.(); }}
-							title={conv.summary || undefined}
+							title={conv.summary ? `${formatRelativeTime(new Date(conv.updated_at), $locale)} · ${conv.summary}` : formatRelativeTime(new Date(conv.updated_at), $locale)}
 							class="sidebar-item w-full rounded-md px-4 text-left transition-colors {currentUuid === conv.uuid
 								? 'bg-bg-primary text-text-primary'
 								: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"

@@ -43,6 +43,33 @@ describe('t store', () => {
 		expect($tEn('sidebar.resultCount', { count: 42 })).toBe('42 results');
 	});
 
+	it('selects singular form for count=1 in English', () => {
+		locale.set('en');
+		const $t = get(t);
+		expect($t('sidebar.resultCount', { count: 1 })).toBe('1 result');
+		expect($t('projects.docCount', { count: 1 })).toBe('1 document');
+	});
+
+	it('selects plural form for count>1 in English', () => {
+		locale.set('en');
+		const $t = get(t);
+		expect($t('sidebar.resultCount', { count: 5 })).toBe('5 results');
+		expect($t('projects.docCount', { count: 3 })).toBe('3 documents');
+	});
+
+	it('selects plural form for count=0 in English', () => {
+		locale.set('en');
+		const $t = get(t);
+		expect($t('sidebar.resultCount', { count: 0 })).toBe('0 results');
+	});
+
+	it('uses same form for all counts in Korean (no plurals)', () => {
+		const $t = get(t);
+		expect($t('sidebar.resultCount', { count: 1 })).toBe('1개 결과');
+		expect($t('sidebar.resultCount', { count: 5 })).toBe('5개 결과');
+		expect($t('projects.docCount', { count: 1 })).toBe('1개 문서');
+	});
+
 	it('returns key as fallback for missing translations', () => {
 		const $t = get(t);
 		const bogusKey = 'nonexistent.key' as TranslationKey;
@@ -67,6 +94,15 @@ describe('getTranslation', () => {
 	it('interpolates parameters', () => {
 		expect(getTranslation('projects.docCount', 'ko', { count: 5 })).toBe('5개 문서');
 		expect(getTranslation('projects.docCount', 'en', { count: 5 })).toBe('5 documents');
+	});
+
+	it('selects singular form for count=1 in English', () => {
+		expect(getTranslation('sidebar.resultCount', 'en', { count: 1 })).toBe('1 result');
+		expect(getTranslation('projects.docCount', 'en', { count: 1 })).toBe('1 document');
+	});
+
+	it('selects plural form for count>1 in English', () => {
+		expect(getTranslation('sidebar.resultCount', 'en', { count: 42 })).toBe('42 results');
 	});
 
 	it('returns key for missing translation', () => {

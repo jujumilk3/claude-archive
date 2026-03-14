@@ -14,6 +14,7 @@ const en: Translations = {
 	'sidebar.searching': 'Searching...',
 	'sidebar.noResults': 'No search results',
 	'sidebar.resultCount': '{count} results',
+	'sidebar.resultCount_one': '{count} result',
 	'sidebar.noConversations': 'No conversations',
 	'sidebar.projects': 'Projects',
 	'sidebar.closeSidebar': 'Close sidebar',
@@ -46,6 +47,7 @@ const en: Translations = {
 	'projects.noProjects': 'No projects',
 	'projects.noMatch': 'No matching projects',
 	'projects.docCount': '{count} documents',
+	'projects.docCount_one': '{count} document',
 	'projects.docsFetchError': 'Failed to load documents',
 	'projects.noDocs': 'No documents',
 

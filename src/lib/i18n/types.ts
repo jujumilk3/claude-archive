@@ -44,8 +44,11 @@ export interface TranslationKeys {
 	'projects.noProjects': string;
 	'projects.noMatch': string;
 	'projects.docCount': string;
+	'projects.docCount_one': string;
 	'projects.docsFetchError': string;
 	'projects.noDocs': string;
+
+	'sidebar.resultCount_one': string;
 
 	'message.thinking': string;
 	'message.result': string;

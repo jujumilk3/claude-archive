@@ -36,8 +36,16 @@ locale.subscribe((loc) => saveLocale(loc));
 
 export const t = derived(locale, ($locale) => {
 	const strings = translations[$locale];
+	const pluralRules = new Intl.PluralRules($locale);
 	return (key: TranslationKey, params?: Record<string, string | number>): string => {
 		let text = strings[key] ?? key;
+		if (params && 'count' in params) {
+			const category = pluralRules.select(Number(params.count));
+			const pluralKey = `${key}_${category}` as TranslationKey;
+			if (strings[pluralKey]) {
+				text = strings[pluralKey];
+			}
+		}
 		if (params) {
 			for (const [k, v] of Object.entries(params)) {
 				text = text.replaceAll(`{${k}}`, String(v));
@@ -109,7 +117,16 @@ export function senderLabel(sender: string, loc: Locale): string {
 }
 
 export function getTranslation(key: TranslationKey, loc: Locale, params?: Record<string, string | number>): string {
-	let text = translations[loc][key] ?? key;
+	const strings = translations[loc];
+	let text = strings[key] ?? key;
+	if (params && 'count' in params) {
+		const rules = new Intl.PluralRules(loc);
+		const category = rules.select(Number(params.count));
+		const pluralKey = `${key}_${category}` as TranslationKey;
+		if (strings[pluralKey]) {
+			text = strings[pluralKey];
+		}
+	}
 	if (params) {
 		for (const [k, v] of Object.entries(params)) {
 			text = text.replaceAll(`{${k}}`, String(v));
