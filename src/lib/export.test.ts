@@ -235,6 +235,22 @@ describe('exportConversationToMarkdown', () => {
 		expect(md.endsWith('\n')).toBe(true);
 		expect(md.endsWith('\n\n')).toBe(false);
 	});
+
+	it('renders English locale labels when locale is en', () => {
+		const md = exportConversationToMarkdown(makeConversation(), [
+			makeMessage({ sender: 'human', text: 'Hi', content_json: JSON.stringify([{ type: 'text', text: 'Hi' }]) }),
+			makeMessage({ sender: 'assistant', text: 'Hello!', content_json: JSON.stringify([{ type: 'text', text: 'Hello!' }]), uuid: 'msg-2' })
+		], 'en');
+		expect(md).toContain('### Me —');
+		expect(md).toContain('### Claude —');
+		expect(md).toContain('**Created**');
+		expect(md).toContain('**Updated**');
+	});
+
+	it('renders untitled fallback in English locale', () => {
+		const md = exportConversationToMarkdown(makeConversation({ name: '' }), [], 'en');
+		expect(md).toContain('# (Untitled)');
+	});
 });
 
 describe('conversationFilename', () => {

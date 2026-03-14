@@ -96,13 +96,9 @@ describe('database schema', () => {
 
 describe('ingested data', () => {
 	const DB_PATH = path.resolve('data', 'archive.db');
+	const hasDb = fs.existsSync(DB_PATH);
 
-	it('has ingested data in archive.db', () => {
-		if (!fs.existsSync(DB_PATH)) {
-			console.log('Skipping: archive.db not found (run npm run ingest first)');
-			return;
-		}
-
+	it.skipIf(!hasDb)('has ingested data in archive.db', () => {
 		const db = new Database(DB_PATH, { readonly: true });
 		const convCount = (db.prepare('SELECT COUNT(*) as count FROM conversation').get() as { count: number }).count;
 		const msgCount = (db.prepare('SELECT COUNT(*) as count FROM message').get() as { count: number }).count;

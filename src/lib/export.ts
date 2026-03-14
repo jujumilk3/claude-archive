@@ -1,16 +1,7 @@
 import type { ConversationDetail, Message } from '$lib/db/queries';
 import { getTranslation, formatTimestamp, senderLabel } from '$lib/i18n';
 import type { Locale } from '$lib/i18n';
-
-interface ContentBlock {
-	type: string;
-	text?: string;
-	name?: string;
-	input?: Record<string, unknown>;
-	content?: Array<{ type: string; text: string }> | string;
-	is_error?: boolean;
-	thinking?: string;
-}
+import type { ContentBlock } from '$lib/types';
 
 function getToolResultText(block: ContentBlock): string {
 	if (typeof block.content === 'string') return block.content;

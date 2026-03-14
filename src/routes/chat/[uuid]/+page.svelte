@@ -54,7 +54,7 @@
 			</div>
 			<button
 				onclick={handleExport}
-				class="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs text-text-secondary transition-colors hover:bg-bg-secondary hover:text-text-primary"
+				class="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs text-text-secondary transition-colors hover:bg-bg-sidebar hover:text-text-primary"
 				aria-label={$t('chat.exportAriaLabel')}
 				title={$t('chat.exportTitle')}
 			>

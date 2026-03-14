@@ -1,16 +1,7 @@
 <script lang="ts">
 	import { renderMarkdown, highlightSearchTerms } from '$lib/markdown';
 	import { t, locale, formatTimestamp } from '$lib/i18n';
-
-	interface ContentBlock {
-		type: string;
-		text?: string;
-		name?: string;
-		input?: Record<string, unknown>;
-		content?: Array<{ type: string; text: string }> | string;
-		is_error?: boolean;
-		thinking?: string;
-	}
+	import type { ContentBlock } from '$lib/types';
 
 	interface Attachment {
 		file_name: string;
@@ -128,8 +119,8 @@
 	<div
 		bind:this={bubbleEl}
 		class="msg-bubble max-w-[85%] rounded-2xl px-4 py-3 {sender === 'human'
-			? 'bg-bg-message-human text-text-primary'
-			: 'text-text-primary'}"
+			? 'bg-bg-message-human text-text-primary human-message'
+			: 'text-text-primary claude-response'}"
 	>
 		{#if attachments.length > 0}
 			<div class="mb-2 flex flex-wrap gap-2">

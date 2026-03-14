@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { escapeFts5Query, buildFts5Query, sanitizeSnippet } from './search';
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
@@ -138,12 +138,7 @@ describe('FTS5 search integration', () => {
 	const SCHEMA_PATH = path.resolve('src', 'lib', 'db', 'schema.sql');
 	let db: Database.Database;
 
-	afterAll(() => {
-		db?.close();
-		if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
-	});
-
-	it('sets up test data', () => {
+	beforeAll(() => {
 		db = new Database(TEST_DB_PATH);
 		const schema = fs.readFileSync(SCHEMA_PATH, 'utf-8');
 		db.exec(schema);
@@ -163,6 +158,11 @@ describe('FTS5 search integration', () => {
 		insertMsg.run('msg-3', '한국어 검색 테스트 메시지입니다', 'human', 2);
 		insertMsg.run('msg-4', 'The file config.yaml has settings', 'assistant', 3);
 		insertMsg.run('msg-5', 'Special chars: $100 price (20% off)', 'human', 4);
+	});
+
+	afterAll(() => {
+		db?.close();
+		if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
 	});
 
 	it('finds multi-word AND matches using buildFts5Query', () => {

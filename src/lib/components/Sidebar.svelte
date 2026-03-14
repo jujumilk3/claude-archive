@@ -370,7 +370,7 @@
 						<button
 							onclick={() => { goto(`/chat/${conv.uuid}`); onNavigate?.(); }}
 							title={conv.summary || undefined}
-							class="w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors {currentUuid === conv.uuid
+							class="sidebar-item w-full rounded-md px-4 text-left transition-colors {currentUuid === conv.uuid
 								? 'bg-bg-primary text-text-primary'
 								: 'text-text-secondary hover:bg-bg-primary hover:text-text-primary'}"
 						>
