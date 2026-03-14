@@ -78,7 +78,8 @@ const en: Translations = {
 	'settings.export': 'Export',
 	'settings.exportDesc': 'Download all conversations',
 	'settings.exportAll': 'Export All',
-	'settings.reset': 'Reset to defaults'
+	'settings.reset': 'Reset to defaults',
+	'settings.exportError': 'Export failed'
 };
 
 export default en;

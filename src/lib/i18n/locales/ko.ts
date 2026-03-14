@@ -78,7 +78,8 @@ const ko: Translations = {
 	'settings.export': '내보내기',
 	'settings.exportDesc': '모든 대화를 다운로드합니다',
 	'settings.exportAll': '전체 내보내기',
-	'settings.reset': '설정 초기화'
+	'settings.reset': '설정 초기화',
+	'settings.exportError': '내보내기 실패'
 };
 
 export default ko;

@@ -78,6 +78,7 @@ export interface TranslationKeys {
 	'settings.exportDesc': string;
 	'settings.exportAll': string;
 	'settings.reset': string;
+	'settings.exportError': string;
 }
 
 export type TranslationKey = keyof TranslationKeys;

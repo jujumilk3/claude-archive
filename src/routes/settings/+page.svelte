@@ -60,7 +60,7 @@
 			a.click();
 			URL.revokeObjectURL(url);
 		} catch (e) {
-			exportError = e instanceof Error ? e.message : 'Export failed';
+			exportError = e instanceof Error ? e.message : $t('settings.exportError');
 		} finally {
 			exporting = false;
 		}
