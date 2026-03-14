@@ -125,7 +125,7 @@
 
 <div
 	id="msg-{uuid}"
-	class="msg-wrapper group/msg mb-4 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
+	class="msg-wrapper group/msg mb-1 flex {sender === 'human' ? 'justify-end' : 'justify-start'} {highlighted ? 'animate-highlight' : ''}"
 >
 	<div
 		bind:this={bubbleEl}
