@@ -79,6 +79,7 @@
 					<div class="mb-3 rounded-lg border border-border">
 						<button
 							onclick={() => toggleProject(project.uuid)}
+							aria-expanded={expandedUuid === project.uuid}
 							class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-bg-sidebar"
 						>
 							<div>

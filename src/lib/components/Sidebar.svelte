@@ -310,7 +310,8 @@
 							</button>
 							<button
 								onclick={() => removeHistoryItem(term)}
-								class="mr-2 hidden text-xs text-text-secondary hover:text-text-primary group-hover:block"
+								aria-label="{term} 검색 기록 삭제"
+								class="mr-2 text-xs text-text-secondary opacity-0 hover:text-text-primary focus:opacity-100 group-hover:opacity-100"
 							>
 								✕
 							</button>
