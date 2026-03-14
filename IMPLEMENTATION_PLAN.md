@@ -53,15 +53,13 @@ All phases implemented. Tagged at `0.0.43`.
 
 - **Phase 40: Design & i18n Polish** — Four spec compliance fixes: (1) **Sidebar width 260→288px**: Updated `Sidebar.svelte` and `+layout.svelte` (both desktop transition width and mobile overlay) to match design-system spec's 288px sidebar width. (2) **`formatRelativeTime()`**: Added missing i18n should-have function using `Intl.RelativeTimeFormat` — auto-selects appropriate unit (year/month/week/day/hour/minute/second) and formats as locale-aware relative string ("2시간 전" / "2 hours ago"). (3) **Custom scrollbar styling**: Added WebKit (`::-webkit-scrollbar`) and Firefox (`scrollbar-width: thin`) scrollbar styles using theme-aware color tokens. (4) **Settings back button i18n**: Added `settings.back` translation key (ko: "뒤로", en: "Back") and replaced hardcoded `aria-label="Back"` in settings page. Added 4 tests for `formatRelativeTime` covering hours/days/minutes in both locales. Test suite: 204 → 208 tests.
 
+- **Phase 41: Svelte API Consistency** — Migrated all 3 components using deprecated `$app/stores` (Svelte 4) to `$app/state` (Svelte 5 runes): `+layout.svelte` (`navigating`), `Sidebar.svelte` (`page`), `chat/[uuid]/+page.svelte` (`page`). Removed `$` prefix from store subscriptions (`$page` → `page`, `$navigating` → `navigating.to`). All components now consistently use the Svelte 5 `$app/state` module, matching `+error.svelte` which already used it. No remaining Svelte 4 API usage. Test suite: 208 tests (no new tests — import/access pattern changes only).
+
 ---
 
 ## Remaining Work
 
-Gaps between specs and implementation, ordered by priority. Specs for these features were added in commit `8772e34`.
-
-### LOW Priority — Polish & Consistency
-
-- **Svelte API Consistency** — Mixed Svelte 4/5 API usage across components. `chat/[uuid]/+page.svelte` and `Sidebar.svelte` use `$app/stores` (Svelte 4 pattern), while `+error.svelte` uses `$app/state` (Svelte 5 runes). Should standardize on one approach across all components.
+No remaining gaps between specs and implementation. All phases complete.
 
 ---
 

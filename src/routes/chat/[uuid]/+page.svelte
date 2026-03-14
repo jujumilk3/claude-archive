@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { tick } from 'svelte';
 	import Message from '$lib/components/Message.svelte';
 	import { exportConversationToMarkdown, downloadMarkdown, conversationFilename } from '$lib/export';
@@ -18,8 +18,8 @@
 	let searchQuery = $state('');
 
 	$effect(() => {
-		const highlight = $page.url.searchParams.get('highlight');
-		const q = $page.url.searchParams.get('q');
+		const highlight = page.url.searchParams.get('highlight');
+		const q = page.url.searchParams.get('q');
 		searchQuery = q || '';
 
 		if (highlight) {

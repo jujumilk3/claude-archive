@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { browser } from '$app/environment';
-	import { navigating } from '$app/stores';
+	import { navigating } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { settings, resolvedTheme, applyTheme, applyFontSize } from '$lib/stores/settings';
 	import type { LayoutProps } from './$types';
@@ -97,7 +97,7 @@
 	{/if}
 
 	<div class="relative flex-1">
-		{#if $navigating}
+		{#if navigating.to}
 			<div class="absolute left-0 right-0 top-0 z-50 h-0.5 overflow-hidden bg-bg-sidebar">
 				<div class="nav-progress h-full bg-accent"></div>
 			</div>

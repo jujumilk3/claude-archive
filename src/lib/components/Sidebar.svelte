@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { t, locale, formatMonthYear } from '$lib/i18n';
 
@@ -92,9 +92,9 @@
 		clearSearch();
 	}
 
-	const currentUuid = $derived($page.params?.uuid || '');
-	const isProjectsPage = $derived($page.url?.pathname === '/projects');
-	const isSettingsPage = $derived($page.url?.pathname === '/settings');
+	const currentUuid = $derived(page.params?.uuid || '');
+	const isProjectsPage = $derived(page.url?.pathname === '/projects');
+	const isSettingsPage = $derived(page.url?.pathname === '/settings');
 
 	$effect(() => {
 		if (!initialized) {
