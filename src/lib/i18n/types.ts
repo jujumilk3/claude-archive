@@ -56,6 +56,7 @@ export interface TranslationKeys {
 	'export.createdAt': string;
 	'export.updatedAt': string;
 
+	'settings.back': string;
 	'settings.title': string;
 	'settings.general': string;
 	'settings.language': string;

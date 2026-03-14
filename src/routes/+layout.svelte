@@ -79,7 +79,7 @@
 				onclick={() => (sidebarCollapsed = true)}
 				aria-label={$t('sidebar.closeSidebar')}
 			></button>
-			<div class="fixed inset-y-0 left-0 z-40 w-[260px]">
+			<div class="fixed inset-y-0 left-0 z-40 w-[288px]">
 				<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
 				initialConversations={data.initialConversations}
 				hasMoreInitial={data.hasMoreConversations} />
@@ -88,7 +88,7 @@
 	{:else}
 		<div
 			class="shrink-0 overflow-hidden transition-[width] duration-200 ease-in-out"
-			style="width: {sidebarCollapsed ? 0 : 260}px"
+			style="width: {sidebarCollapsed ? 0 : 288}px"
 		>
 			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
 				initialConversations={data.initialConversations}

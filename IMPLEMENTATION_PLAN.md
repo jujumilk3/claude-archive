@@ -51,37 +51,17 @@ All phases implemented. Tagged at `0.0.43`.
 
 - **Phase 39: Design System & Code Quality** — Comprehensive design system overhaul plus code quality fixes. (1) **HSL Color Token System**: Replaced 8 hex CSS variables with full HSL-based system — added gray scale palette (`--_gray-0` through `--_gray-900`), `--_brand-clay`, and spec-exact semantic tokens for both light and dark modes. Light mode uses spec HSL values (e.g., `hsl(48 33.3% 97.1%)` for main background). Border tokens use 15% opacity per spec. (2) **Font System**: Added 6 `@font-face` declarations for Anthropic Sans/Serif/Mono (variable weights, normal + italic, `font-display: swap`). Created `--font-ui`, `--font-serif`, `--font-mono` CSS custom properties with Pretendard CJK fallback. (3) **Typography**: Applied spec-exact values — `.claude-response` (Serif 16px/24px/400), `.human-message` (Sans 16px/22.4px/430), `.sidebar-item` (Sans 12px/16px/430/32px height), `code`/`pre code` uses `--font-mono`. (4) **ContentBlock Dedup**: Extracted `ContentBlock` interface to `src/lib/types.ts`; both `export.ts` and `Message.svelte` import from shared module. (5) **Bug Fix**: Fixed undefined `hover:bg-bg-secondary` token in chat export button (changed to `hover:bg-bg-sidebar`). (6) **Test Quality**: `db.test.ts` uses `it.skipIf` for proper skip reporting; `search.test.ts` moved setup to `beforeAll`; `export.test.ts` added 2 English locale tests. Test suite: 203 → 204 tests.
 
+- **Phase 40: Design & i18n Polish** — Four spec compliance fixes: (1) **Sidebar width 260→288px**: Updated `Sidebar.svelte` and `+layout.svelte` (both desktop transition width and mobile overlay) to match design-system spec's 288px sidebar width. (2) **`formatRelativeTime()`**: Added missing i18n should-have function using `Intl.RelativeTimeFormat` — auto-selects appropriate unit (year/month/week/day/hour/minute/second) and formats as locale-aware relative string ("2시간 전" / "2 hours ago"). (3) **Custom scrollbar styling**: Added WebKit (`::-webkit-scrollbar`) and Firefox (`scrollbar-width: thin`) scrollbar styles using theme-aware color tokens. (4) **Settings back button i18n**: Added `settings.back` translation key (ko: "뒤로", en: "Back") and replaced hardcoded `aria-label="Back"` in settings page. Added 4 tests for `formatRelativeTime` covering hours/days/minutes in both locales. Test suite: 204 → 208 tests.
+
 ---
 
 ## Remaining Work
 
 Gaps between specs and implementation, ordered by priority. Specs for these features were added in commit `8772e34`.
 
-### HIGH Priority — Core Functionality Gaps
-
-- ~~**i18n: Remaining Component Migration**~~ ✅ Completed (Phase 37). All 3 components migrated: `chat/[uuid]/+page.svelte` (4 strings), `projects/+page.svelte` (12 strings + locale-aware date formatting), `Message.svelte` (5 strings). Added 5 new `message.*` translation keys to types, `ko.ts`, and `en.ts`.
-
-- ~~**i18n: Test Coverage**~~ ✅ Completed (Phase 37). Added 26 tests covering: `t()` store reactivity on locale change, parameter interpolation, missing key fallback, `getTranslation` non-reactive API, `formatDate`/`formatMonthYear`/`formatNumber`/`formatTimestamp`/`formatShortDate` output per locale, `senderLabel` mapping, `availableLocales` shape, locale file completeness validation, and `message.*` key existence checks.
-
-- ~~**Settings Page**~~ ✅ Completed (Phase 38). Created `/settings` route (General, Appearance, Data sections), `src/lib/stores/settings.ts` with localStorage persistence, light mode CSS tokens, FOUC prevention script, `/api/export` endpoint. Test suite: 189 → 203 tests.
-
-### MEDIUM Priority — Design & Visual Fidelity
-
-- ~~**Design System: Custom Fonts**~~ ✅ Completed (Phase 39). Added 6 `@font-face` declarations (Anthropic Sans/Serif/Mono, normal + italic, variable weights) with `font-display: swap`. Created CSS custom properties `--font-ui`, `--font-serif`, `--font-mono` with comprehensive fallback chains (Pretendard for CJK, system fonts). Applied `claude-response` class (Serif 16px/24px weight 400) to assistant messages and `human-message` class (Sans 16px/22.4px weight 430) to user messages. Sidebar items use `sidebar-item` class (Sans 12px/16px weight 430, 32px height). Font files go in `static/fonts/` when available; fallback chain ensures graceful degradation.
-
-- ~~**Design System: Full Color Token System**~~ ✅ Completed (Phase 39). Migrated `app.css` from 8 hex CSS variables to full HSL-based system per spec. Added complete gray scale palette (`--_gray-0` through `--_gray-900`) and `--_brand-clay` to `:root`. Dark mode semantic tokens reference gray scale variables. Light mode uses spec-exact HSL values (e.g., `--bg-primary: hsl(48 33.3% 97.1%)`, `--text-primary: hsl(60 2.6% 7.6%)`). Border tokens use 15% opacity as specified. Added `--text-muted` token for inactive text. Skeleton shimmer uses theme-aware `--skeleton-mid` variable. Mark highlight uses brand-clay token.
-
-- ~~**Design System: Typography Tokens**~~ ✅ Completed (Phase 39). Applied spec-exact typography values: `.claude-response` (Serif 16px/24px weight 400, bold 600), `.human-message` (Sans 16px/22.4px weight 430), `.sidebar-item` (Sans 12px/16px weight 430, height 32px), body default (Sans 16px/24px). Code blocks use `--font-mono`. All values match `specs/design-system-claude.md` exactly.
-
 ### LOW Priority — Polish & Consistency
 
-- ~~**Design System: Light Mode**~~ ✅ Completed (Phase 39). Light mode now uses spec-exact HSL values from `specs/design-system-claude.md`. Token values updated to match: `--bg-primary: hsl(48 33.3% 97.1%)` (warm off-white rgb 250,249,245), `--bg-message-human: hsl(48 25% 92.2%)` (rgb 240,238,230), `--text-primary: hsl(60 2.6% 7.6%)` (rgb 20,20,19), border at 15% opacity. Depends on Phase 39 color token system (now complete).
-
 - **Svelte API Consistency** — Mixed Svelte 4/5 API usage across components. `chat/[uuid]/+page.svelte` and `Sidebar.svelte` use `$app/stores` (Svelte 4 pattern), while `+error.svelte` uses `$app/state` (Svelte 5 runes). Should standardize on one approach across all components.
-
-- ~~**ContentBlock Interface Duplication**~~ ✅ Completed (Phase 39). Extracted `ContentBlock` interface to `src/lib/types.ts`. Both `src/lib/export.ts` and `src/lib/components/Message.svelte` now import from the shared module.
-
-- ~~**Test Quality Issues**~~ ✅ Completed (Phase 39). (1) `db.test.ts` now uses `it.skipIf(!hasDb)` for proper vitest skip reporting instead of silent return. (2) `search.test.ts` FTS5 integration moved setup from first `it` block to `beforeAll`. (3) `export.test.ts` added 2 tests exercising `'en'` locale parameter (English sender labels, metadata labels, untitled fallback). Test suite: 203 → 204 tests.
 
 ---
 

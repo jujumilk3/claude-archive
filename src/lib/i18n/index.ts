@@ -77,6 +77,33 @@ export function formatShortDate(isoDate: string, loc: Locale): string {
 	}).format(new Date(isoDate));
 }
 
+export function formatRelativeTime(date: Date, loc: Locale): string {
+	const now = Date.now();
+	const diffMs = date.getTime() - now;
+	const absDiffSec = Math.abs(diffMs) / 1000;
+
+	const units: [Intl.RelativeTimeFormatUnit, number][] = [
+		['year', 365 * 24 * 60 * 60],
+		['month', 30 * 24 * 60 * 60],
+		['week', 7 * 24 * 60 * 60],
+		['day', 24 * 60 * 60],
+		['hour', 60 * 60],
+		['minute', 60],
+		['second', 1]
+	];
+
+	const rtf = new Intl.RelativeTimeFormat(loc, { numeric: 'auto' });
+
+	for (const [unit, threshold] of units) {
+		if (absDiffSec >= threshold) {
+			const value = Math.round(diffMs / 1000 / threshold);
+			return rtf.format(value, unit);
+		}
+	}
+
+	return rtf.format(0, 'second');
+}
+
 export function senderLabel(sender: string, loc: Locale): string {
 	return sender === 'human' ? translations[loc]['common.senderHuman'] : translations[loc]['common.senderAssistant'];
 }

@@ -58,6 +58,7 @@ const ko: Translations = {
 	'export.createdAt': '생성일',
 	'export.updatedAt': '수정일',
 
+	'settings.back': '뒤로',
 	'settings.title': '설정',
 	'settings.general': '일반',
 	'settings.language': '언어',

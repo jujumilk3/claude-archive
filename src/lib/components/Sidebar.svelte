@@ -280,7 +280,7 @@
 	const dateGroups = $derived(groupByDate(conversations));
 </script>
 
-<aside class="flex h-full w-[260px] min-w-[260px] flex-col border-r border-border bg-bg-sidebar">
+<aside class="flex h-full w-[288px] min-w-[288px] flex-col border-r border-border bg-bg-sidebar">
 	<div class="p-3">
 		<div class="relative">
 			<input

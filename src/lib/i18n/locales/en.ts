@@ -58,6 +58,7 @@ const en: Translations = {
 	'export.createdAt': 'Created',
 	'export.updatedAt': 'Updated',
 
+	'settings.back': 'Back',
 	'settings.title': 'Settings',
 	'settings.general': 'General',
 	'settings.language': 'Language',

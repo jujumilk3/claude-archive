@@ -8,6 +8,7 @@ import {
 	formatNumber,
 	formatTimestamp,
 	formatShortDate,
+	formatRelativeTime,
 	senderLabel,
 	getTranslation,
 	availableLocales
@@ -156,6 +157,36 @@ describe('formatShortDate', () => {
 		expect(result).toContain('March');
 		expect(result).toContain('14');
 		expect(result).toContain('2026');
+	});
+});
+
+describe('formatRelativeTime', () => {
+	it('formats hours ago in Korean', () => {
+		const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+		const result = formatRelativeTime(twoHoursAgo, 'ko');
+		expect(result).toContain('2');
+		expect(result).toContain('시간');
+	});
+
+	it('formats hours ago in English', () => {
+		const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+		const result = formatRelativeTime(twoHoursAgo, 'en');
+		expect(result).toContain('2');
+		expect(result).toContain('hours');
+	});
+
+	it('formats days ago', () => {
+		const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+		const result = formatRelativeTime(threeDaysAgo, 'en');
+		expect(result).toContain('3');
+		expect(result).toContain('day');
+	});
+
+	it('formats minutes ago', () => {
+		const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+		const result = formatRelativeTime(fiveMinAgo, 'en');
+		expect(result).toContain('5');
+		expect(result).toContain('minute');
 	});
 });
 
