@@ -27,19 +27,22 @@
 
 		expandedUuid = uuid;
 		loadingDocs = true;
+		docs = [];
 
 		try {
 			const res = await fetch(`/api/projects/${uuid}`);
+			if (expandedUuid !== uuid) return;
 			if (!res.ok) {
 				docs = [];
 				return;
 			}
 			const result = await res.json();
+			if (expandedUuid !== uuid) return;
 			docs = result.docs ?? [];
 		} catch {
-			docs = [];
+			if (expandedUuid === uuid) docs = [];
 		} finally {
-			loadingDocs = false;
+			if (expandedUuid === uuid) loadingDocs = false;
 		}
 	}
 </script>

@@ -6,6 +6,7 @@ export const load: PageServerLoad = () => {
 		const stats = getArchiveStats();
 		return { stats };
 	} catch (e) {
+		if (typeof e === 'object' && e !== null && 'status' in e) throw e;
 		console.error('Failed to load archive stats:', e);
 		return { stats: null };
 	}

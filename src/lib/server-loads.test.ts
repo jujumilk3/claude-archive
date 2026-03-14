@@ -128,6 +128,20 @@ describe('home page server load', () => {
 		const result = load() as { stats: null };
 		expect(result.stats).toBeNull();
 	});
+
+	it('re-throws HttpError without wrapping', () => {
+		const httpError = new Error('Service unavailable') as Error & { status: number };
+		httpError.status = 503;
+		mockStats.mockImplementation(() => { throw httpError; });
+
+		try {
+			load();
+			expect.fail('should have thrown');
+		} catch (e: unknown) {
+			const err = e as { status: number };
+			expect(err.status).toBe(503);
+		}
+	});
 });
 
 describe('chat page server load', () => {

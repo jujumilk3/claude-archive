@@ -17,7 +17,7 @@ vi.mock('$lib/search', () => ({
 	buildFts5Query: vi.fn((q: string) => {
 		const escaped = q.replace(/['"*()[\]{}\-:^~+.]/g, ' ').trim();
 		if (!escaped) return null;
-		const words = escaped.split(/\s+/).filter((w: string) => w.length > 0);
+		const words = escaped.split(/\s+/).filter((w: string) => w.length >= 2);
 		if (words.length === 0) return null;
 		return words.map((w: string) => `"${w}"`).join(' ');
 	}),
@@ -289,12 +289,20 @@ describe('GET /api/search', () => {
 		expect(mockSearch).toHaveBeenCalledWith(expect.any(String), 0, 100);
 	});
 
-	it('calculates hasMore correctly', async () => {
+	it('calculates hasMore=true when more results exist', async () => {
 		mockSearch.mockReturnValue({ results: [{ snippet: 'x' }], total: 50 });
 		const res = GET({ url: makeUrl('/api/search', { q: 'test', offset: '0', limit: '20' }) });
 		const data = await parseJson(res);
 
 		expect(data.hasMore).toBe(true);
+	});
+
+	it('calculates hasMore=false when at end of results', async () => {
+		mockSearch.mockReturnValue({ results: [{ snippet: 'x' }], total: 5 });
+		const res = GET({ url: makeUrl('/api/search', { q: 'test', offset: '0', limit: '20' }) });
+		const data = await parseJson(res);
+
+		expect(data.hasMore).toBe(false);
 	});
 
 	it('throws 500 on search error', () => {
@@ -366,6 +374,32 @@ describe('GET /api/projects/:uuid', () => {
 
 	it('throws 500 on database error', () => {
 		mockProject.mockImplementation(() => { throw new Error('DB error'); });
+
+		try {
+			GET({ params: { uuid: 'p1' } });
+			expect.fail('should have thrown');
+		} catch (e: unknown) {
+			const err = e as { status: number };
+			expect(err.status).toBe(500);
+		}
+	});
+
+	it('re-throws HttpError without wrapping', () => {
+		const httpError = new Error('Service error') as Error & { status: number };
+		httpError.status = 503;
+		mockProject.mockImplementation(() => { throw httpError; });
+
+		try {
+			GET({ params: { uuid: 'p1' } });
+			expect.fail('should have thrown');
+		} catch (e: unknown) {
+			const err = e as { status: number };
+			expect(err.status).toBe(503);
+		}
+	});
+
+	it('throws 500 when getProjectDocs fails', () => {
+		mockDocs.mockImplementation(() => { throw new Error('Docs query failed'); });
 
 		try {
 			GET({ params: { uuid: 'p1' } });

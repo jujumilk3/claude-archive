@@ -86,6 +86,15 @@ describe('buildFts5Query', () => {
 	it('collapses extra whitespace', () => {
 		expect(buildFts5Query('  hello   world  ')).toBe('"hello" "world"');
 	});
+
+	it('filters out single-character words (consistent with highlightSearchTerms)', () => {
+		expect(buildFts5Query('a hello')).toBe('"hello"');
+		expect(buildFts5Query('I am ok')).toBe('"am" "ok"');
+	});
+
+	it('returns null when all words are single characters', () => {
+		expect(buildFts5Query('a b c')).toBeNull();
+	});
 });
 
 describe('sanitizeSnippet', () => {
