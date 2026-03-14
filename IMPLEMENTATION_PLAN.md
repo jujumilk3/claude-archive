@@ -6,7 +6,7 @@ Read-only SvelteKit archive viewer for exported Claude.ai conversations.
 
 ## Completed Phases
 
-All phases implemented. Tagged at `0.0.38`.
+All phases implemented. Tagged at `0.0.39`.
 
 - **Phase 1: Foundation** — SvelteKit scaffold, SQLite schema + FTS5, data ingestion script
 - **Phase 2: Layout & Theme** — 2-column dark layout, Tailwind v4 theme, sidebar toggle
@@ -38,6 +38,7 @@ All phases implemented. Tagged at `0.0.38`.
 - **Phase 28: Security, Error Handling & Accessibility** — Escaped inline `codespan` text in markdown renderer to prevent XSS via malicious backtick content. Added `HttpError` re-throw guards to `+layout.server.ts` and `projects/+page.server.ts` catch blocks (completing the pattern across all server loads). Added error handling to project docs fetch with HTTP status check, catch block, and variable shadowing fix. Removed dead `totalConversations` prop from Sidebar. Added `aria-label` attributes to search inputs, clear buttons, and sidebar toggle for screen reader accessibility. Test suite: 104 → 106 tests.
 - **Phase 29: Conversation Summary Display** — Surfaced the previously unused `summary` field in two places: (1) chat view header shows summary as a secondary line below the conversation title (conditionally, only when summary exists), (2) sidebar conversation items show summary as a native tooltip on hover. The `summary` field was already fetched by both `getConversationByUuid` and the conversations list API — this phase simply wires it into the UI. No new tests needed (pure template changes with existing data flow). Test suite: 106 tests.
 - **Phase 30: Home Page Archive Statistics** — Replaced the static placeholder home page with a dynamic statistics dashboard. Added `getArchiveStats()` query to `queries.ts` that returns total conversations, messages, projects, and the date range of the archive in a single efficient query. Added `+page.server.ts` for the home route to load stats via SSR. Updated the home page UI to display three stat cards (대화/메시지/프로젝트 counts) with the accent color and the archive date range below. Gracefully falls back to the original "대화를 선택하세요" message if stats fail to load. Added 2 tests for `getArchiveStats`. Test suite: 106 → 108 tests.
+- **Phase 31: Search AND Matching** — Changed multi-word search from exact phrase matching to word-level AND matching. Previously, searching "typescript error" only found the exact phrase; now it finds messages containing both "typescript" AND "error" anywhere in the text. Added `buildFts5Query()` to `search.ts` that escapes input, splits into words, and wraps each in FTS5 quotes (e.g. `"typescript" "error"`). Updated search API endpoint to use `buildFts5Query` instead of manual quote wrapping. The `highlightSearchTerms()` function in `markdown.ts` already highlights individual terms, so in-conversation highlighting works correctly with the new query format. Added 8 unit tests for `buildFts5Query` and 1 new integration test for cross-word AND matching. Test suite: 108 → 117 tests.
 
 ## Notes
 

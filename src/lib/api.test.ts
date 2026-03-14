@@ -14,6 +14,13 @@ vi.mock('$lib/db/queries', () => ({
 
 vi.mock('$lib/search', () => ({
 	escapeFts5Query: vi.fn((q: string) => q.replace(/['"*()[\]{}\-:^~+.]/g, ' ').trim()),
+	buildFts5Query: vi.fn((q: string) => {
+		const escaped = q.replace(/['"*()[\]{}\-:^~+.]/g, ' ').trim();
+		if (!escaped) return null;
+		const words = escaped.split(/\s+/).filter((w: string) => w.length > 0);
+		if (words.length === 0) return null;
+		return words.map((w: string) => `"${w}"`).join(' ');
+	}),
 	sanitizeSnippet: vi.fn((s: string) => `sanitized:${s}`)
 }));
 
@@ -264,10 +271,10 @@ describe('GET /api/search', () => {
 		expect(data.results[0].snippet).toContain('sanitized:');
 	});
 
-	it('wraps escaped query in double quotes for FTS5', async () => {
+	it('builds FTS5 query with individual quoted terms for AND matching', async () => {
 		GET({ url: makeUrl('/api/search', { q: 'hello world' }) });
 
-		expect(mockSearch).toHaveBeenCalledWith('"hello world"', 0, 20);
+		expect(mockSearch).toHaveBeenCalledWith('"hello" "world"', 0, 20);
 	});
 
 	it('respects offset and limit params', async () => {

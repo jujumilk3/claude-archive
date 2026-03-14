@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { escapeFts5Query, sanitizeSnippet } from './search';
+import { escapeFts5Query, buildFts5Query, sanitizeSnippet } from './search';
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -51,6 +51,40 @@ describe('escapeFts5Query', () => {
 	it('collapses special chars to spaces between words', () => {
 		const result = escapeFts5Query('hello-world');
 		expect(result).toBe('hello world');
+	});
+});
+
+describe('buildFts5Query', () => {
+	it('wraps single word in quotes', () => {
+		expect(buildFts5Query('hello')).toBe('"hello"');
+	});
+
+	it('splits multi-word input into individual quoted terms', () => {
+		expect(buildFts5Query('typescript error')).toBe('"typescript" "error"');
+	});
+
+	it('handles three or more words', () => {
+		expect(buildFts5Query('react state management')).toBe('"react" "state" "management"');
+	});
+
+	it('returns null for empty input', () => {
+		expect(buildFts5Query('')).toBeNull();
+	});
+
+	it('returns null for all-special-char input', () => {
+		expect(buildFts5Query('***')).toBeNull();
+	});
+
+	it('strips special chars and builds query from remaining words', () => {
+		expect(buildFts5Query('config.yaml settings')).toBe('"config" "yaml" "settings"');
+	});
+
+	it('handles Korean multi-word queries', () => {
+		expect(buildFts5Query('검색 테스트')).toBe('"검색" "테스트"');
+	});
+
+	it('collapses extra whitespace', () => {
+		expect(buildFts5Query('  hello   world  ')).toBe('"hello" "world"');
 	});
 });
 
@@ -122,54 +156,62 @@ describe('FTS5 search integration', () => {
 		insertMsg.run('msg-5', 'Special chars: $100 price (20% off)', 'human', 4);
 	});
 
-	it('finds exact phrase matches', () => {
-		const escaped = escapeFts5Query('Hello world');
+	it('finds multi-word AND matches using buildFts5Query', () => {
+		const query = buildFts5Query('Hello world')!;
+		expect(query).toBe('"Hello" "world"');
 		const results = db
-			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH '"${escaped}"'`)
-			.all();
+			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH ?`)
+			.all(query);
 		expect(results.length).toBeGreaterThan(0);
 	});
 
-	it('finds single word matches', () => {
-		const escaped = escapeFts5Query('Python');
+	it('finds words in any order with AND matching', () => {
+		const query = buildFts5Query('sorting Python')!;
+		expect(query).toBe('"sorting" "Python"');
 		const results = db
-			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH '"${escaped}"'`)
-			.all();
+			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH ?`)
+			.all(query);
+		expect(results.length).toBe(1);
+	});
+
+	it('finds single word matches', () => {
+		const query = buildFts5Query('Python')!;
+		const results = db
+			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH ?`)
+			.all(query);
 		expect(results.length).toBe(1);
 	});
 
 	it('finds Korean text', () => {
-		const escaped = escapeFts5Query('검색');
+		const query = buildFts5Query('검색')!;
 		const results = db
-			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH '"${escaped}"'`)
-			.all();
+			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH ?`)
+			.all(query);
 		expect(results.length).toBe(1);
 	});
 
 	it('handles queries with special characters safely', () => {
-		const escaped = escapeFts5Query('config.yaml');
-		expect(escaped).toBe('config yaml');
-		// unicode61 tokenizer treats . as separator, so "config yaml" matches "config.yaml"
+		const query = buildFts5Query('config.yaml')!;
+		expect(query).toBe('"config" "yaml"');
 		const results = db
-			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH '"${escaped}"'`)
-			.all();
+			.prepare(`SELECT * FROM message_fts WHERE message_fts MATCH ?`)
+			.all(query);
 		expect(results.length).toBe(1);
 	});
 
 	it('handles all-special-char query without error', () => {
-		const escaped = escapeFts5Query('***');
-		expect(escaped).toBe('');
-		// Empty query should not be sent to FTS5 — caller guards this
+		const query = buildFts5Query('***');
+		expect(query).toBeNull();
 	});
 
 	it('generates snippets with mark tags', () => {
-		const escaped = escapeFts5Query('Python');
+		const query = buildFts5Query('Python')!;
 		const results = db
 			.prepare(
 				`SELECT snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet
-				 FROM message_fts WHERE message_fts MATCH '"${escaped}"'`
+				 FROM message_fts WHERE message_fts MATCH ?`
 			)
-			.all() as { snippet: string }[];
+			.all(query) as { snippet: string }[];
 		expect(results.length).toBe(1);
 		expect(results[0].snippet).toContain('<mark>');
 		expect(results[0].snippet).toContain('</mark>');
@@ -181,13 +223,13 @@ describe('FTS5 search integration', () => {
 			 VALUES ('msg-xss', 'conv-1', 'Check <img src=x onerror=alert(1)> injection test', '[]', 'human', '2025-01-01T00:00:00Z', 5)`
 		).run();
 
-		const escaped = escapeFts5Query('injection');
+		const query = buildFts5Query('injection')!;
 		const results = db
 			.prepare(
 				`SELECT snippet(message_fts, 0, '<mark>', '</mark>', '...', 32) as snippet
-				 FROM message_fts WHERE message_fts MATCH '"${escaped}"'`
+				 FROM message_fts WHERE message_fts MATCH ?`
 			)
-			.all() as { snippet: string }[];
+			.all(query) as { snippet: string }[];
 		expect(results.length).toBe(1);
 		expect(results[0].snippet).toContain('<img');
 		const sanitized = sanitizeSnippet(results[0].snippet);
@@ -197,16 +239,16 @@ describe('FTS5 search integration', () => {
 	});
 
 	it('returns results joined with conversation data', () => {
-		const escaped = escapeFts5Query('Hello');
+		const query = buildFts5Query('Hello')!;
 		const results = db
 			.prepare(
 				`SELECT m.uuid, m.sender, c.name as conversation_name
 				 FROM message_fts
 				 JOIN message m ON m.rowid = message_fts.rowid
 				 JOIN conversation c ON c.uuid = m.conversation_uuid
-				 WHERE message_fts MATCH '"${escaped}"'`
+				 WHERE message_fts MATCH ?`
 			)
-			.all() as { uuid: string; sender: string; conversation_name: string }[];
+			.all(query) as { uuid: string; sender: string; conversation_name: string }[];
 		expect(results.length).toBe(1);
 		expect(results[0].uuid).toBe('msg-1');
 		expect(results[0].sender).toBe('human');

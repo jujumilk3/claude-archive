@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { escapeFts5Query, sanitizeSnippet } from '$lib/search';
+import { buildFts5Query, sanitizeSnippet } from '$lib/search';
 import { searchMessages } from '$lib/db/queries';
 
 export const GET: RequestHandler = ({ url }) => {
@@ -12,14 +12,13 @@ export const GET: RequestHandler = ({ url }) => {
 		return json({ results: [], total: 0, hasMore: false });
 	}
 
-	const escaped = escapeFts5Query(q);
+	const ftsQuery = buildFts5Query(q);
 
-	if (!escaped) {
+	if (!ftsQuery) {
 		return json({ results: [], total: 0, hasMore: false });
 	}
 
 	try {
-		const ftsQuery = `"${escaped}"`;
 		const { results, total } = searchMessages(ftsQuery, offset, limit);
 
 		return json({
