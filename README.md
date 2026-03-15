@@ -2,6 +2,12 @@
 
 A self-hosted archive viewer for exported Claude and ChatGPT conversations. Browse, search, and read your past chats with a UI that closely mirrors claude.ai.
 
+## Screenshots
+
+| Home (empty) | Home (with data) | Settings |
+|:---:|:---:|:---:|
+| ![Home - empty](docs/images/1.png) | ![Home - with data](docs/images/2.png) | ![Settings](docs/images/3.png) |
+
 ## Features
 
 - **Multi-source import** — supports both Claude and OpenAI ChatGPT exports (auto-detected)

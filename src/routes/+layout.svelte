@@ -138,7 +138,7 @@
 			class="shrink-0 overflow-hidden transition-[width] duration-200 ease-in-out"
 			style="width: {sidebarCollapsed ? 0 : 288}px"
 		>
-			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate}
+			<Sidebar bind:this={sidebarRef} onNavigate={handleSidebarNavigate} onToggleSidebar={toggleSidebar}
 				initialConversations={data.initialConversations}
 				hasMoreInitial={data.hasMoreConversations} />
 		</div>
@@ -149,20 +149,6 @@
 			<div class="absolute left-0 right-0 top-0 z-50 h-0.5 overflow-hidden bg-bg-sidebar">
 				<div class="nav-progress h-full bg-accent"></div>
 			</div>
-		{/if}
-
-		{#if !sidebarCollapsed && !isMobile}
-			<button
-				onclick={toggleSidebar}
-				class="absolute left-3 top-3 z-10 rounded-md p-1.5 text-text-secondary hover:bg-bg-sidebar hover:text-text-primary"
-				title={$t('sidebar.closeSidebarShortcut')}
-				aria-label={$t('sidebar.closeSidebar')}
-			>
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-					<rect x="3" y="3" width="18" height="18" rx="2" />
-					<path d="M9 3v18" />
-				</svg>
-			</button>
 		{/if}
 
 		{@render children()}
