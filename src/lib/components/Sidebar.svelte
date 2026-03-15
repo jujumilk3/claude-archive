@@ -93,6 +93,10 @@
 		clearSearch();
 	}
 
+	export function reload() {
+		loadConversations(0);
+	}
+
 	const currentUuid = $derived(page.params?.uuid || '');
 	const isProjectsPage = $derived(page.url?.pathname === '/projects');
 	const isSettingsPage = $derived(page.url?.pathname === '/settings');

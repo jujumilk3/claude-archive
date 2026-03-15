@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { t, locale, availableLocales } from '$lib/i18n';
+	import { sidebarRef } from '$lib/stores/sidebar';
 	import type { Locale } from '$lib/i18n';
 	import {
 		settings,
@@ -30,6 +30,9 @@
 	let importResult = $state('');
 	let importError = $state('');
 	let fileInput: HTMLInputElement;
+	let resetting = $state(false);
+	let resetResult = $state('');
+	let resetError = $state('');
 
 	function setTheme(theme: Theme) {
 		settings.update((s) => ({ ...s, theme }));
@@ -86,11 +89,28 @@
 				.replace('{conversations}', String(result.conversations))
 				.replace('{messages}', String(result.messages))
 				.replace('{projects}', String(result.projects));
-			await invalidateAll();
+			$sidebarRef?.reload();
 		} catch (e) {
 			importError = e instanceof Error ? e.message : $t('import.error');
 		} finally {
 			importing = false;
+		}
+	}
+
+	async function handleResetDb() {
+		if (!confirm($t('danger.resetDbConfirm'))) return;
+		resetting = true;
+		resetResult = '';
+		resetError = '';
+		try {
+			const res = await fetch('/api/reset', { method: 'POST' });
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			resetResult = $t('danger.resetDbSuccess');
+			$sidebarRef?.reload();
+		} catch (e) {
+			resetError = e instanceof Error ? e.message : $t('danger.resetDbError');
+		} finally {
+			resetting = false;
 		}
 	}
 
@@ -221,6 +241,34 @@
 			{#if importError}
 				<p class="mt-3 text-sm text-red-400">{importError}</p>
 			{/if}
+		</section>
+
+		<!-- Danger Zone -->
+		<section class="mb-8">
+			<h2 class="mb-4 border-b border-red-400/50 pb-2 text-sm font-medium uppercase tracking-wider text-red-400">
+				{$t('danger.title')}
+			</h2>
+			<div class="rounded-lg border border-red-400/30 p-4">
+				<div class="flex items-center justify-between gap-4">
+					<div>
+						<p class="text-sm font-medium text-text-primary">{$t('danger.resetDb')}</p>
+						<p class="mt-0.5 text-xs text-text-secondary">{$t('danger.resetDbDesc')}</p>
+					</div>
+					<button
+						onclick={handleResetDb}
+						disabled={resetting}
+						class="shrink-0 rounded-md border border-red-400 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-400 hover:text-white disabled:opacity-50"
+					>
+						{resetting ? '...' : $t('danger.resetDb')}
+					</button>
+				</div>
+				{#if resetResult}
+					<p class="mt-3 text-sm text-green-500">{resetResult}</p>
+				{/if}
+				{#if resetError}
+					<p class="mt-3 text-sm text-red-400">{resetError}</p>
+				{/if}
+			</div>
 		</section>
 
 		<!-- Reset -->

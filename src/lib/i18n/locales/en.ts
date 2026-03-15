@@ -88,6 +88,13 @@ const en: Translations = {
 	'sidebar.deselectAll': 'Deselect All',
 	'sidebar.confirmDelete': 'Delete {count} conversations? This cannot be undone.',
 
+	'danger.title': 'Danger Zone',
+	'danger.resetDb': 'Reset Database',
+	'danger.resetDbDesc': 'Delete all conversations, messages, and projects. This action cannot be undone.',
+	'danger.resetDbConfirm': 'Are you sure you want to delete all data? This cannot be undone.',
+	'danger.resetDbSuccess': 'Database has been reset.',
+	'danger.resetDbError': 'Failed to reset database.',
+
 	'import.title': 'Import Claude Data',
 	'import.description': 'Upload your Claude export files to get started. Go to claude.ai → Settings → Export to download your data.',
 	'import.dropzone': 'Drop conversations.json and projects.json here',

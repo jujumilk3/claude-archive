@@ -5,11 +5,16 @@
 	import { navigating } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { settings, resolvedTheme, applyTheme, applyFontSize } from '$lib/stores/settings';
+	import { sidebarRef as sidebarStore } from '$lib/stores/sidebar';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
 	let sidebarCollapsed = $state(false);
 	let sidebarRef = $state<Sidebar>();
+
+	$effect(() => {
+		sidebarStore.set(sidebarRef ?? null);
+	});
 	let isMobile = $state(false);
 
 	$effect(() => {
@@ -88,6 +93,10 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>Claude Archive</title>
+</svelte:head>
 
 <svelte:window onkeydown={handleKeydown} />
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t, locale, formatDate, formatNumber } from '$lib/i18n';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
+	import { sidebarRef } from '$lib/stores/sidebar';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -66,6 +67,7 @@
 				.replace('{messages}', String(result.messages))
 				.replace('{projects}', String(result.projects));
 			await invalidateAll();
+			$sidebarRef?.reload();
 		} catch (e) {
 			importError = e instanceof Error ? e.message : $t('import.error');
 		} finally {

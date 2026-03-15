@@ -88,6 +88,13 @@ const ko: Translations = {
 	'sidebar.deselectAll': '선택 해제',
 	'sidebar.confirmDelete': '{count}개 대화를 삭제하시겠습니까? 되돌릴 수 없습니다.',
 
+	'danger.title': '위험 구역',
+	'danger.resetDb': '데이터베이스 초기화',
+	'danger.resetDbDesc': '모든 대화, 메시지, 프로젝트를 삭제합니다. 이 작업은 되돌릴 수 없습니다.',
+	'danger.resetDbConfirm': '정말로 모든 데이터를 삭제하시겠습니까? 되돌릴 수 없습니다.',
+	'danger.resetDbSuccess': '데이터베이스가 초기화되었습니다.',
+	'danger.resetDbError': '데이터베이스 초기화에 실패했습니다.',
+
 	'import.title': 'Claude 데이터 가져오기',
 	'import.description': 'Claude export 파일을 업로드하세요. claude.ai → 설정 → 내보내기에서 데이터를 다운로드할 수 있습니다.',
 	'import.dropzone': 'conversations.json, projects.json 파일을 여기에 놓으세요',

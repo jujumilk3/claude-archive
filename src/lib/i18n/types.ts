@@ -87,6 +87,13 @@ export interface TranslationKeys {
 	'sidebar.deselectAll': string;
 	'sidebar.confirmDelete': string;
 
+	'danger.title': string;
+	'danger.resetDb': string;
+	'danger.resetDbDesc': string;
+	'danger.resetDbConfirm': string;
+	'danger.resetDbSuccess': string;
+	'danger.resetDbError': string;
+
 	'import.title': string;
 	'import.description': string;
 	'import.dropzone': string;
